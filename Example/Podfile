@@ -1,0 +1,13 @@
+use_frameworks!
+
+platform :ios, '10.0'
+
+target 'LFComponents_Example' do
+  pod 'LFComponents', :path => '../'
+
+  target 'LFComponents_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
