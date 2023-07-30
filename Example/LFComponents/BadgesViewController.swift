@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import LFComponents
 
 class BadgesViewController: UIViewController {
     
@@ -38,7 +39,11 @@ class BadgesViewController: UIViewController {
         return item
     }()
 
-    var notificationCount: Int = 0
+    var notificationCount: Int = 0 {
+        didSet {
+            githubIcon.badges.set(.dot)
+        }
+    }
     
     var notificationText: String = ""
 

@@ -18,6 +18,16 @@ public protocol BadgesAdaptable {
     var badgeView: BadgeView {get}
     
     var isHidden: Bool {get set}
+    
+    func setBadge(height: CGFloat)
+    
+    func addDot(color: UIColor?)
+    
+    func addBadge(text: String?)
+    
+    func addBadge(number: Int)
+    
+    func setBadge(color: UIColor)
 }
 
 // MARK: - BadgesAdaptable default implementaions
@@ -32,16 +42,27 @@ extension BadgesAdaptable {
             badgeView.isHidden = newValue
         }
     }
+    
+    public func setBadge(color: UIColor) {
+        badgeView.backgroundColor = color
+    }
 }
 
-public class Badges<BaseView: BadgesAdaptable> {
+public struct Badges<BaseView: BadgesAdaptable> {
     public let baseView: BaseView
     public init(baseView: BaseView) {
         self.baseView = baseView
     }
     
     public func set(_ content: BadgeStyle) {
-        
+        switch content {
+        case .dot:
+            baseView.addDot(color: .red)
+        case let .number(number: number):
+            baseView.addBadge(number: number)
+        case let .text(text: text):
+            baseView.addBadge(text: text)
+        }
     }
 }
 
