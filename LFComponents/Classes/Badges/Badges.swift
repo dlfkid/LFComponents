@@ -10,14 +10,13 @@ import UIKit
 /// The available badge content type
 public enum BadgeStyle {
     case dot
-    case number(_ number: Int)
-    case text(_ text: String)
+    case number(_ number: Int?)
+    case text(_ text: String?)
+    case clean
 }
 
 public protocol BadgesAdaptable {
     var badgeView: BadgeView {get}
-    
-    var isHidden: Bool {get set}
     
     func setBadge(height: CGFloat)
     
@@ -28,21 +27,13 @@ public protocol BadgesAdaptable {
     func addBadge(number: Int)
     
     func setBadge(color: UIColor)
+    
+    func cleanBadge()
 }
 
 // MARK: - BadgesAdaptable default implementaions
 
 extension BadgesAdaptable {
-    public var isHidden: Bool {
-        get {
-            badgeView.isHidden
-        }
-        
-        set {
-            badgeView.isHidden = newValue
-        }
-    }
-    
     public func setBadge(color: UIColor) {
         badgeView.backgroundColor = color
     }
@@ -59,9 +50,11 @@ public struct Badges<BaseView: BadgesAdaptable> {
         case .dot:
             baseView.addDot(color: .red)
         case let .number(number: number):
-            baseView.addBadge(number: number)
+            baseView.addBadge(number: number ?? 0)
         case let .text(text: text):
-            baseView.addBadge(text: text)
+            baseView.addBadge(text: text ?? "")
+        case .clean:
+            baseView.cleanBadge()
         }
     }
 }

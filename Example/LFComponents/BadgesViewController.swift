@@ -34,6 +34,46 @@ class BadgesViewController: UIViewController {
         return button
     }()
     
+    private lazy var dotButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.frame = CGRect(x: 16, y: 300, width: 130, height: 44)
+        button.setTitle("Dot", for: .normal)
+        button.backgroundColor = .white
+        button.layer.cornerRadius = 8
+        button.setTitleColor(.black, for: .normal)
+        return button
+    }()
+    
+    private lazy var clearDotButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.frame = CGRect(x: UIScreen.main.bounds.width - 16 - 130,
+                              y: 300, width: 130, height: 44)
+        button.setTitle("Clear Dot", for: .normal)
+        button.backgroundColor = .white
+        button.layer.cornerRadius = 8
+        button.setTitleColor(.black, for: .normal)
+        return button
+    }()
+    
+    private lazy var textBadgeInputView: UITextField = {
+        let textField = UITextField(frame: CGRect(x: 16, y: 400, width: UIScreen.main.bounds.width - 32, height: 44))
+        textField.placeholder = "Input text here"
+        textField.borderStyle = .roundedRect
+        textField.textAlignment = .center
+        return textField
+    }()
+    
+    private lazy var textBadgeButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.frame = CGRect(x: 16, y: 500, width: 130, height: 44)
+        button.setTitle("Text Badge", for: .normal)
+        button.backgroundColor = .white
+        button.layer.cornerRadius = 8
+        button.setTitleColor(.black, for: .normal)
+        return button
+    }()
+    
+    
     private lazy var rightBarButtonItem: UIBarButtonItem = {
         let item = UIBarButtonItem(title: "RightItem", style: .done, target: self, action: #selector(rightBarButtonAction))
         return item
@@ -41,7 +81,8 @@ class BadgesViewController: UIViewController {
 
     var notificationCount: Int = 0 {
         didSet {
-            githubIcon.badges.set(.dot)
+            githubIcon.badges.set(.number(notificationCount))
+            rightBarButtonItem.badges.set(.number(notificationCount))
         }
     }
     
@@ -68,9 +109,53 @@ class BadgesViewController: UIViewController {
         decrementButton.addTarget(self,
                                   action: #selector(self.testDecrement),
                                   for: .touchUpInside)
+        
+        view.addSubview(dotButton)
+        view.addSubview(clearDotButton)
+        
+        dotButton.center.y = CGRectGetMaxY(incrementButton.frame) + 18
+        clearDotButton.center.y = CGRectGetMaxY(incrementButton.frame) + 18
+        
+        dotButton.addTarget(self,
+                            action: #selector(self.makeDot),
+                            for: .touchUpInside)
+        
+        clearDotButton.addTarget(self,
+                                 action: #selector(self.clearDot),
+                                 for: .touchUpInside)
+        
+        view.addSubview(textBadgeButton)
+        
+        view.addSubview(textBadgeInputView)
+        
+        textBadgeInputView.center.y = CGRectGetMinY(githubIcon.frame) - 40
+        textBadgeInputView.delegate = self
+        
+        textBadgeButton.center.y = CGRectGetMaxY(dotButton.frame) + 18
+        
+        textBadgeButton.addTarget(self,
+                                  action: #selector(textBadgeAction),
+                                  for: .touchUpInside)
+        
+        
+        
         navigationItem.rightBarButtonItem = rightBarButtonItem
     }
 }
+
+extension BadgesViewController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        notificationText = textBadgeInputView.text ?? ""
+        return true
+    }
+}
+
+
 
 extension BadgesViewController {
     @objc private func testIncrement() {
@@ -83,5 +168,20 @@ extension BadgesViewController {
     
     @objc private func rightBarButtonAction() {
         
+    }
+    
+    @objc private func makeDot() {
+        githubIcon.badges.set(.dot)
+        rightBarButtonItem.badges.set(.dot)
+    }
+    
+    @objc private func clearDot() {
+        githubIcon.badges.set(.clean)
+        rightBarButtonItem.badges.set(.clean)
+    }
+    
+    @objc private func textBadgeAction() {
+        githubIcon.badges.set(.text(notificationText))
+        rightBarButtonItem.badges.set(.text(notificationText))
     }
 }
