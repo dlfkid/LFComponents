@@ -8,29 +8,29 @@
 import Foundation
 
 extension UIBarButtonItem: BadgesAdaptable {
+    
     public func cleanBadge() {
         _bottomView.badges.set(.clean)
     }
-    
-    public func setBadge(height: CGFloat) {
-        _bottomView.setBadge(height: height)
-    }
-    
     
     public var badgeView: BadgeView {
         return _bottomView.badgeView
     }
     
-    public func addDot(color: UIColor?) {
-        _bottomView.badges.set(.dot)
+    public func addDot() {
+        _bottomView.addDot()
     }
     
     public func addBadge(text: String?) {
-        _bottomView.badges.set(.text(text))
+        _bottomView.addBadge(text: text)
     }
     
     public func addBadge(number: Int) {
-        _bottomView.badges.set(.number(number))
+        _bottomView.addBadge(number: number)
+    }
+    
+    public func addBadge(icon: UIImage?) {
+        _bottomView.addBadge(icon: icon)
     }
     
     /// 通过Xcode视图调试工具找到UIBarButtonItem的Badge所在父视图为:UIImageView

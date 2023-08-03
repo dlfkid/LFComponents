@@ -12,21 +12,39 @@ public enum BadgeStyle {
     case dot
     case number(_ number: Int?)
     case text(_ text: String?)
+    case icon(_ icon: UIImage?)
     case clean
+}
+
+public enum BadgePostion: CaseIterable {
+    case topRightCorner
+    case leftMiddle
+    case rightMiddle
+}
+
+extension BadgePostion {
+    public var positionDesc: String {
+        switch self {
+        case .topRightCorner:
+            return "Top right corner"
+        case .leftMiddle:
+            return "Left middle"
+        case .rightMiddle:
+            return "Right middle"
+        }
+    }
 }
 
 public protocol BadgesAdaptable {
     var badgeView: BadgeView {get}
     
-    func setBadge(height: CGFloat)
-    
-    func addDot(color: UIColor?)
+    func addDot()
     
     func addBadge(text: String?)
     
     func addBadge(number: Int)
     
-    func setBadge(color: UIColor)
+    func addBadge(icon: UIImage?)
     
     func cleanBadge()
 }
@@ -34,28 +52,86 @@ public protocol BadgesAdaptable {
 // MARK: - BadgesAdaptable default implementaions
 
 extension BadgesAdaptable {
-    public func setBadge(color: UIColor) {
-        badgeView.backgroundColor = color
+    public func move(badgeView: BadgeView, position: BadgePostion, offset: CGPoint) {
+        guard let superView = badgeView.superview else {
+            return
+        }
+        switch position {
+        case .topRightCorner: do {
+            // 根据内容调整自身大小
+            badgeView.sizeToFit()
+            
+            // 移动到右上角
+            let right = superView.width
+            // 调整中心位置
+            let offset = badgeView.image == nil ? 4.0 : 8.0
+            badgeView.x = right + offset
+            badgeView.y = 0
+        }
+            
+        case .leftMiddle: do {
+            // 根据内容调整自身大小
+            badgeView.sizeToFit()
+            let offset = badgeView.image == nil ? 4.0 : 8.0
+            badgeView.right = -offset
+            badgeView.centerY = superView.height / 2
+        }
+            
+        case .rightMiddle: do {
+            // 根据内容调整自身大小
+            badgeView.sizeToFit()
+            let offset = badgeView.image == nil ? 4.0 : 8.0
+            badgeView.left = superView.width + offset
+            badgeView.centerY = superView.height / 2
+        }
+        }
+        // 向左不可超过自身一半, 或16px
+        let limitMinX = -(badgeView.image == nil ? 16 : badgeView.width / 2)
+        let x = max(limitMinX, offset.x)
+        badgeView.x += x
+        // 向上不可超过徽标2/1
+        let limitY = -(badgeView.height / 2)
+        let y = max(limitY, offset.y)
+        badgeView.y += y
     }
 }
 
 public struct Badges<BaseView: BadgesAdaptable> {
-    public let baseView: BaseView
+    /// 宿主View
+    fileprivate let baseView: BaseView
     public init(baseView: BaseView) {
         self.baseView = baseView
     }
     
+    /// 便利构造方法, 在View右上角与自身顶部平齐距离自身4px的位置创建徽标
+    /// - Parameter content: 徽标内容
     public func set(_ content: BadgeStyle) {
+        set(content: content, position: .topRightCorner)
+    }
+    
+    /// 设置徽标
+    /// - Parameters:
+    ///   - content: 徽标内容
+    ///   - position: 徽标起始位置
+    ///   - offset: 根据起始位置做的偏移量
+    public func set(content: BadgeStyle, position: BadgePostion, offset: CGPoint = CGPointMake(0, 0), color: UIColor = .red) {
         switch content {
         case .dot:
-            baseView.addDot(color: .red)
+            baseView.addDot()
+            baseView.badgeView.backgroundColor = color
         case let .number(number: number):
             baseView.addBadge(number: number ?? 0)
+            baseView.badgeView.backgroundColor = color
         case let .text(text: text):
             baseView.addBadge(text: text ?? "")
+            baseView.badgeView.backgroundColor = color
+        case let .icon(icon: icon):
+            baseView.addBadge(icon: icon)
+            baseView.badgeView.backgroundColor = .clear
         case .clean:
             baseView.cleanBadge()
         }
+        baseView.move(badgeView: baseView.badgeView, position: position, offset: offset)
     }
 }
 
@@ -83,29 +159,16 @@ public class BadgeView: UIControl {
         }
     }
     
+    public var image: UIImage? {
+        didSet {
+            imageView.image = image
+        }
+    }
+    
     /// Set Font
     public var font: UIFont? {
         didSet {
             textLabel.font = font
-        }
-    }
-    
-    /// Set background image
-    public var backgroundImage: UIImage? {
-        didSet {
-            imageView.image = backgroundImage
-            if let _ = backgroundImage {
-                if let constraint = heightConstraint() {
-                    badgeViewHeightConstraint = constraint
-                    removeConstraint(constraint)
-                }
-                backgroundColor = UIColor.clear
-            } else {
-                if heightConstraint() == nil, let constraint = badgeViewHeightConstraint {
-                    addConstraint(constraint)
-                }
-                backgroundColor = badgeViewColor
-            }
         }
     }
     
@@ -142,18 +205,19 @@ public class BadgeView: UIControl {
         textLabel.textAlignment = .center
         addSubview(textLabel)
         addSubview(imageView)
-        addLayout(with: imageView, leading: 0, trailing: 0)
-        addLayout(with: textLabel, leading: 5, trailing: -5)
     }
     
-    private func addLayout(with view: UIView, leading: CGFloat, trailing: CGFloat) {
-        view.translatesAutoresizingMaskIntoConstraints = false
-        let topConstraint = NSLayoutConstraint(item: view, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1.0, constant: 0)
-        let leadingConstraint = NSLayoutConstraint(item: view, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1.0, constant: leading)
-        let bottomConstraint = NSLayoutConstraint(item: view, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1.0, constant: 0)
-        let trailingConstraint = NSLayoutConstraint(item: view, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1.0, constant: trailing)
-        leadingConstraint.priority = UILayoutPriority(rawValue: 999)
-        trailingConstraint.priority = UILayoutPriority(rawValue: 999)
-        addConstraints([topConstraint, leadingConstraint, bottomConstraint, trailingConstraint])
+    public override func sizeToFit() {
+        textLabel.sizeToFit()
+        imageView.sizeToFit()
+        let margin = text == nil && image == nil ? 6.0 : 3.0
+        let width = max(textLabel.frame.width, imageView.frame.width) + margin
+        let height = max(textLabel.frame.height, imageView.frame.height) + margin
+        let actualWidth = max(width, height)
+        frame = CGRect(x: frame.origin.x, y: frame.origin.y, width: actualWidth, height: height)
+        textLabel.center = CGPoint(x: self.width / 2, y: self.height / 2)
+        imageView.center = CGPoint(x: self.width / 2, y: self.height / 2)
+        layer.cornerRadius = image == nil ? height / 2 : 0
+        setNeedsLayout()
     }
 }

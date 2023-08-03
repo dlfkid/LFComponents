@@ -13,6 +13,11 @@ class BadgesViewController: UIViewController {
     
     private let githubIcon = UIImageView(image: UIImage(named: "github_color"))
     
+    private var offsetX: CGFloat = 0
+    private var offsetY: CGFloat = 0
+    
+    private var badgePosition = BadgePostion.topRightCorner
+    
     private lazy var decrementButton: UIButton = {
         let button = UIButton(type: .system)
         button.frame = CGRect(x: 16, y: 200, width: 130, height: 44)
@@ -73,6 +78,57 @@ class BadgesViewController: UIViewController {
         return button
     }()
     
+    private lazy var changePositionButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.frame = CGRect(x: UIScreen.main.bounds.width - 16 - 130,
+                              y: 500, width: 130, height: 44)
+        button.setTitle("Change Position", for: .normal)
+        button.backgroundColor = .white
+        button.layer.cornerRadius = 8
+        button.setTitleColor(.black, for: .normal)
+        return button
+    }()
+    
+    private lazy var iconBadgeButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.frame = CGRect(x: UIScreen.main.bounds.width - 16 - 130,
+                              y: 500, width: 130, height: 44)
+        button.setTitle("Icon badge", for: .normal)
+        button.backgroundColor = .white
+        button.layer.cornerRadius = 8
+        button.setTitleColor(.black, for: .normal)
+        return button
+    }()
+    
+    private lazy var offsetSliderX: UISlider = {
+        let slider = UISlider(frame: CGRect(x: 0, y: 0, width: 100, height: 18))
+        slider.maximumValue = 30
+        slider.minimumValue = -30
+        return slider
+    }()
+    
+    private lazy var labelSliderX: UILabel = {
+        let label = UILabel(frame: .zero)
+        label.textAlignment = .center
+        label.text = "offset X = 0"
+        label.sizeToFit()
+        return label
+    }()
+    
+    private lazy var offsetSliderY: UISlider = {
+        let slider = UISlider(frame: CGRect(x: 0, y: 0, width: 100, height: 18))
+        slider.maximumValue = 30
+        slider.minimumValue = -30
+        return slider
+    }()
+    
+    private lazy var labelSliderY: UILabel = {
+        let label = UILabel(frame: .zero)
+        label.textAlignment = .center
+        label.text = "offset Y = 0"
+        label.sizeToFit()
+        return label
+    }()
     
     private lazy var rightBarButtonItem: UIBarButtonItem = {
         let item = UIBarButtonItem(title: "RightItem", style: .done, target: self, action: #selector(rightBarButtonAction))
@@ -81,8 +137,8 @@ class BadgesViewController: UIViewController {
 
     var notificationCount: Int = 0 {
         didSet {
-            githubIcon.badges.set(.number(notificationCount))
-            rightBarButtonItem.badges.set(.number(notificationCount))
+            githubIcon.badges.set(content: .number(notificationCount), position: badgePosition, offset: CGPoint(x: offsetX, y: offsetY))
+            rightBarButtonItem.badges.set(content: .number(notificationCount), position: badgePosition, offset: CGPoint(x: offsetX, y: offsetY))
         }
     }
     
@@ -90,12 +146,13 @@ class BadgesViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.rightBarButtonItem = rightBarButtonItem
         title = "Badges"
         view.backgroundColor = .white
         view.addSubview(githubIcon)
         githubIcon.sizeToFit()
-        githubIcon.center.x = LayoutConstants.centerX
-        githubIcon.center.y = LayoutConstants.centerY - 100
+        githubIcon.center.x = LayoutConstants.screenWidth / 2
+        githubIcon.center.y = LayoutConstants.screenHeight / 2 - 100
         
         view.addSubview(incrementButton)
         view.addSubview(decrementButton)
@@ -126,6 +183,7 @@ class BadgesViewController: UIViewController {
         
         view.addSubview(textBadgeButton)
         
+        
         view.addSubview(textBadgeInputView)
         
         textBadgeInputView.center.y = CGRectGetMinY(githubIcon.frame) - 40
@@ -137,9 +195,34 @@ class BadgesViewController: UIViewController {
                                   action: #selector(textBadgeAction),
                                   for: .touchUpInside)
         
+        view.addSubview(changePositionButton)
+        changePositionButton.center.y = CGRectGetMaxY(textBadgeButton.frame) + 18
+        changePositionButton.addTarget(self,
+                                       action: #selector(changePositionAction),
+                                       for: .touchUpInside)
         
+        view.addSubview(iconBadgeButton)
+        iconBadgeButton.y = textBadgeButton.y
+        iconBadgeButton.centerX = clearDotButton.centerX
+        iconBadgeButton.addTarget(self, action: #selector(iconBadgeAction), for: .touchUpInside)
         
-        navigationItem.rightBarButtonItem = rightBarButtonItem
+        offsetSliderX.addTarget(self, action: #selector(sliderNewValueAction(_:)), for: .valueChanged)
+        view.addSubview(offsetSliderX)
+        offsetSliderX.bottom = textBadgeInputView.top - 16
+        offsetSliderX.centerX = textBadgeInputView.centerX
+        
+        view.addSubview(labelSliderX)
+        labelSliderX.centerY = offsetSliderX.centerY
+        labelSliderX.right = offsetSliderX.left - 10
+        
+        offsetSliderY.addTarget(self, action: #selector(sliderNewValueAction(_:)), for: .valueChanged)
+        view.addSubview(offsetSliderY)
+        offsetSliderY.bottom = offsetSliderX.top - 16
+        offsetSliderY.centerX = textBadgeInputView.centerX
+        
+        view.addSubview(labelSliderY)
+        labelSliderY.centerY = offsetSliderY.centerY
+        labelSliderY.right = offsetSliderY.left - 10
     }
 }
 
@@ -155,8 +238,6 @@ extension BadgesViewController: UITextFieldDelegate {
     }
 }
 
-
-
 extension BadgesViewController {
     @objc private func testIncrement() {
         notificationCount += 1
@@ -171,8 +252,8 @@ extension BadgesViewController {
     }
     
     @objc private func makeDot() {
-        githubIcon.badges.set(.dot)
-        rightBarButtonItem.badges.set(.dot)
+        githubIcon.badges.set(content: .dot, position: badgePosition, offset: CGPoint(x: offsetX, y: offsetY))
+        rightBarButtonItem.badges.set(content: .dot, position: badgePosition, offset: CGPoint(x: offsetX, y: offsetY))
     }
     
     @objc private func clearDot() {
@@ -181,7 +262,50 @@ extension BadgesViewController {
     }
     
     @objc private func textBadgeAction() {
-        githubIcon.badges.set(.text(notificationText))
-        rightBarButtonItem.badges.set(.text(notificationText))
+        githubIcon.badges.set(content: .text(notificationText), position: badgePosition, offset: CGPoint(x: offsetX, y: offsetY))
+        rightBarButtonItem.badges.set(content: .text(notificationText), position: badgePosition, offset: CGPoint(x: offsetX, y: offsetY))
+    }
+    
+    @objc private func iconBadgeAction() {
+        githubIcon.badges.set(content: .icon(UIImage(named: "verified")), position: badgePosition, offset: CGPoint(x: offsetX, y: offsetY))
+    }
+    
+    @objc private func changePositionAction() {
+        let actionSheet = UIAlertController(title: "Switch BadgePosition", message: nil, preferredStyle: .actionSheet)
+        let action1 = UIAlertAction(title: BadgePostion.topRightCorner.positionDesc, style: .default)
+        { (action) in
+            self.badgePosition = .topRightCorner
+        }
+        let action2 = UIAlertAction(title: BadgePostion.leftMiddle.positionDesc, style: .default)
+        { (action) in
+            self.badgePosition = .leftMiddle
+        }
+        let action3 = UIAlertAction(title: BadgePostion.rightMiddle.positionDesc, style: .default)
+        { (action) in
+            self.badgePosition = .rightMiddle
+        }
+        let cancel = UIAlertAction(title: "Cancel", style: .cancel)
+        actionSheet.addAction(action1)
+        actionSheet.addAction(action2)
+        actionSheet.addAction(action3)
+        actionSheet.addAction(cancel)
+        present(actionSheet, animated: true)
+    }
+    
+    @objc private func sliderNewValueAction(_ sender: UISlider) {
+        if sender == offsetSliderX {
+            offsetX = CGFloat(sender.value)
+            labelSliderX.text = String(format: "offset X: %.1f", offsetX)
+            labelSliderX.sizeToFit()
+            labelSliderX.right = offsetSliderX.left - 10
+            return
+        }
+        if sender == offsetSliderY {
+            offsetY = CGFloat(sender.value)
+            labelSliderY.text = String(format: "offset Y: %.1f", offsetY)
+            labelSliderY.sizeToFit()
+            labelSliderY.right = offsetSliderY.left - 10
+            return
+        }
     }
 }

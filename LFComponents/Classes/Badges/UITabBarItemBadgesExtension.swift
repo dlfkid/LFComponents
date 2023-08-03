@@ -8,24 +8,24 @@
 import Foundation
 
 extension UITabBarItem: BadgesAdaptable {
-    public func setBadge(height: CGFloat) {
-        _bottomView.badgeView.setBadge(height: height)
-    }
-    
     public var badgeView: BadgeView {
         return _bottomView.badgeView
     }
     
-    public func addDot(color: UIColor?) {
-        _bottomView.badges.set(.dot)
+    public func addDot() {
+        _bottomView.addDot()
     }
     
     public func addBadge(text: String?) {
-        _bottomView.badges.set(.text(text))
+        _bottomView.addBadge(text: text)
     }
     
     public func addBadge(number: Int) {
-        _bottomView.badges.set(.number(number))
+        _bottomView.addBadge(number: number)
+    }
+    
+    public func addBadge(icon: UIImage?) {
+        _bottomView.addBadge(icon: icon)
     }
     
     public func cleanBadge() {
