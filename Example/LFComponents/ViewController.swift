@@ -10,6 +10,7 @@ import UIKit
 
 enum UIComponentType: CaseIterable {
     case Badges
+    case Sidebar
 }
 
 extension UIComponentType {
@@ -17,6 +18,8 @@ extension UIComponentType {
         switch self {
             case .Badges:
                 return "Badges"
+        case .Sidebar:
+            return "SideBar"
         }
     }
 }
@@ -54,7 +57,11 @@ extension ViewController: UITableViewDelegate {
         case .Badges:
             let badgesViewController = BadgesViewController()
             navigationController?.pushViewController(badgesViewController, animated: true)
+        case .Sidebar:
+            let sidebarViewController = SidebarViewController()
+            navigationController?.pushViewController(sidebarViewController, animated: true)
         }
+        
     }
 }
 
