@@ -14,6 +14,8 @@
 		35F559C62A7E926B000BD17D /* CarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35F559C52A7E926B000BD17D /* CarViewController.swift */; };
 		35F559C82A7E9270000BD17D /* BusViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35F559C72A7E9270000BD17D /* BusViewController.swift */; };
 		35F559CA2A7E927C000BD17D /* TramViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35F559C92A7E927C000BD17D /* TramViewController.swift */; };
+		35F559CC2A82832A000BD17D /* SidemenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35F559CB2A82832A000BD17D /* SidemenuViewController.swift */; };
+		35F559CE2A828F31000BD17D /* SidemenuOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35F559CD2A828F31000BD17D /* SidemenuOption.swift */; };
 		3735048766389445DC08029C /* Pods_LFComponents_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA25BCD4CCED7A0C8697F4F /* Pods_LFComponents_Tests.framework */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
@@ -43,6 +45,8 @@
 		35F559C52A7E926B000BD17D /* CarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarViewController.swift; sourceTree = "<group>"; };
 		35F559C72A7E9270000BD17D /* BusViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusViewController.swift; sourceTree = "<group>"; };
 		35F559C92A7E927C000BD17D /* TramViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TramViewController.swift; sourceTree = "<group>"; };
+		35F559CB2A82832A000BD17D /* SidemenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidemenuViewController.swift; sourceTree = "<group>"; };
+		35F559CD2A828F31000BD17D /* SidemenuOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidemenuOption.swift; sourceTree = "<group>"; };
 		37A7D6DC4E5B0B0C92CA6A4A /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* LFComponents_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LFComponents_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -118,11 +122,13 @@
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
 				352E296B2A74D0090021FD90 /* BadgesViewController.swift */,
 				35F559C12A7E2745000BD17D /* SidebarViewController.swift */,
+				35F559CD2A828F31000BD17D /* SidemenuOption.swift */,
 				35F559C32A7E9263000BD17D /* AirplaneViewController.swift */,
 				35F559C52A7E926B000BD17D /* CarViewController.swift */,
 				35F559C72A7E9270000BD17D /* BusViewController.swift */,
 				35F559C92A7E927C000BD17D /* TramViewController.swift */,
 				352E296F2A74D1E10021FD90 /* LayoutConstants.swift */,
+				35F559CB2A82832A000BD17D /* SidemenuViewController.swift */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
@@ -350,11 +356,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				35F559CC2A82832A000BD17D /* SidemenuViewController.swift in Sources */,
 				35F559C22A7E2745000BD17D /* SidebarViewController.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				352E296C2A74D0090021FD90 /* BadgesViewController.swift in Sources */,
 				35F559C82A7E9270000BD17D /* BusViewController.swift in Sources */,
 				35F559C62A7E926B000BD17D /* CarViewController.swift in Sources */,
+				35F559CE2A828F31000BD17D /* SidemenuOption.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 				35F559C42A7E9263000BD17D /* AirplaneViewController.swift in Sources */,
 				35F559CA2A7E927C000BD17D /* TramViewController.swift in Sources */,
@@ -499,7 +507,7 @@
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = LFComponents/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
@@ -518,7 +526,7 @@
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = LFComponents/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";

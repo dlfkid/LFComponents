@@ -59,7 +59,8 @@ extension ViewController: UITableViewDelegate {
             navigationController?.pushViewController(badgesViewController, animated: true)
         case .Sidebar:
             let sidebarViewController = SidebarViewController()
-            navigationController?.pushViewController(sidebarViewController, animated: true)
+            sidebarViewController.modalPresentationStyle = .fullScreen
+            present(sidebarViewController, animated: true)
         }
         
     }
@@ -73,6 +74,7 @@ extension ViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let componentCase = dataSource[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentfier, for: indexPath)
+        cell.selectionStyle = .none
         cell.textLabel?.text = componentCase.caseTitle
         return cell
     }
