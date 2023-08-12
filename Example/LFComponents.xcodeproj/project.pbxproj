@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		352E296C2A74D0090021FD90 /* BadgesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352E296B2A74D0090021FD90 /* BadgesViewController.swift */; };
 		352E29702A74D1E10021FD90 /* LayoutConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352E296F2A74D1E10021FD90 /* LayoutConstants.swift */; };
-		35F559C22A7E2745000BD17D /* SidebarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35F559C12A7E2745000BD17D /* SidebarViewController.swift */; };
 		35F559C42A7E9263000BD17D /* AirplaneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35F559C32A7E9263000BD17D /* AirplaneViewController.swift */; };
 		35F559C62A7E926B000BD17D /* CarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35F559C52A7E926B000BD17D /* CarViewController.swift */; };
 		35F559C82A7E9270000BD17D /* BusViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35F559C72A7E9270000BD17D /* BusViewController.swift */; };
@@ -40,7 +39,6 @@
 		27FBC18BA2DBCB206D20D785 /* Pods-LFComponents_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LFComponents_Tests.release.xcconfig"; path = "Target Support Files/Pods-LFComponents_Tests/Pods-LFComponents_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		352E296B2A74D0090021FD90 /* BadgesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgesViewController.swift; sourceTree = "<group>"; };
 		352E296F2A74D1E10021FD90 /* LayoutConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutConstants.swift; sourceTree = "<group>"; };
-		35F559C12A7E2745000BD17D /* SidebarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarViewController.swift; sourceTree = "<group>"; };
 		35F559C32A7E9263000BD17D /* AirplaneViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirplaneViewController.swift; sourceTree = "<group>"; };
 		35F559C52A7E926B000BD17D /* CarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarViewController.swift; sourceTree = "<group>"; };
 		35F559C72A7E9270000BD17D /* BusViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusViewController.swift; sourceTree = "<group>"; };
@@ -121,7 +119,6 @@
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
 				352E296B2A74D0090021FD90 /* BadgesViewController.swift */,
-				35F559C12A7E2745000BD17D /* SidebarViewController.swift */,
 				35F559CD2A828F31000BD17D /* SidemenuOption.swift */,
 				35F559C32A7E9263000BD17D /* AirplaneViewController.swift */,
 				35F559C52A7E926B000BD17D /* CarViewController.swift */,
@@ -357,7 +354,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				35F559CC2A82832A000BD17D /* SidemenuViewController.swift in Sources */,
-				35F559C22A7E2745000BD17D /* SidebarViewController.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				352E296C2A74D0090021FD90 /* BadgesViewController.swift in Sources */,
 				35F559C82A7E9270000BD17D /* BusViewController.swift in Sources */,

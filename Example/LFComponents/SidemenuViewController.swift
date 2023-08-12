@@ -7,10 +7,11 @@
 //
 
 import UIKit
+import LFComponents
 
-class SidemenuViewController: UIViewController {
+class SidemenuViewController: UIViewController, SideMenuControllable {
     
-    public weak var delegate: SideMenuOptionHandlable?
+    weak var sideMenuContainer: LFComponents.SideMenuContainerViewController?
     
     let reuseIdentifier = "SidemenuViewControllerCells"
     
@@ -37,11 +38,10 @@ class SidemenuViewController: UIViewController {
 
 extension SidemenuViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let delegate = self.delegate else {
+        guard let delegate = self.sideMenuContainer else {
             return
         }
-        let option = menuOptions[indexPath.row]
-        delegate.didSelectedItem(item: option)
+        delegate.didSelectedItem(index: indexPath.row)
     }
 }
 

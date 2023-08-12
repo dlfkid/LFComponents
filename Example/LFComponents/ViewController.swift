@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import LFComponents
 
 enum UIComponentType: CaseIterable {
     case Badges
@@ -58,9 +59,16 @@ extension ViewController: UITableViewDelegate {
             let badgesViewController = BadgesViewController()
             navigationController?.pushViewController(badgesViewController, animated: true)
         case .Sidebar:
-            let sidebarViewController = SidebarViewController()
-            sidebarViewController.modalPresentationStyle = .fullScreen
-            present(sidebarViewController, animated: true)
+            let sidebarViewController = SideMenuContainerViewController()
+            sidebarViewController.primaryViewControllerIndex = 3
+            sidebarViewController.sideMenuViewController = SidemenuViewController()
+            sidebarViewController.contentViewControllers = [
+                AirplaneViewController(),
+                CarViewController(),
+                BusViewController(),
+                TramViewController(),
+            ]
+            navigationController?.pushViewController(sidebarViewController, animated: true)
         }
         
     }

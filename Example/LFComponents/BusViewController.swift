@@ -7,10 +7,11 @@
 //
 
 import UIKit
+import LFComponents
 
-class BusViewController: UIViewController {
+class BusViewController: UIViewController, SideMenuControllable {
     
-    public weak var delegate: SideMenuControllable?
+    weak var sideMenuContainer: LFComponents.SideMenuContainerViewController?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,7 +25,7 @@ class BusViewController: UIViewController {
 
 extension BusViewController {
     @objc private func menuButtonAction() {
-        guard let delegate = delegate else {
+        guard let delegate = sideMenuContainer else {
             return
         }
         delegate.sidemenuSwitchState()
