@@ -105,15 +105,14 @@ extension SideMenuContainerViewController {
         }
     }
     
-    public func didSelectedItem(index: Int) {
-        sidemenuSwitchState()
+    public func segueToPrimaryViewController(index: Int) {
+        guard index != primaryViewControllerIndex else {
+            return
+        }
         guard let primarayViewController = primiaryViewController, let nav = primarayViewController.navigationController else {
             return
         }
         nav.popToRootViewController(animated: false)
-        guard index != primaryViewControllerIndex else {
-            return
-        }
         guard let nextController = contentViewControllers?[index] else {
             return
         }

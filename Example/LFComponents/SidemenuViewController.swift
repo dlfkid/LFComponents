@@ -41,7 +41,7 @@ extension SidemenuViewController: UITableViewDelegate {
         guard let delegate = self.sideMenuContainer else {
             return
         }
-        delegate.didSelectedItem(index: indexPath.row)
+        delegate.segueToPrimaryViewController(index: indexPath.row)
     }
 }
 
