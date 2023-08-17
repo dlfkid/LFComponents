@@ -106,10 +106,11 @@ extension SideMenuContainerViewController {
     }
     
     public func segueToPrimaryViewController(index: Int) {
-        guard index != primaryViewControllerIndex else {
+        guard let primarayViewController = primiaryViewController, let nav = primarayViewController.navigationController else {
             return
         }
-        guard let primarayViewController = primiaryViewController, let nav = primarayViewController.navigationController else {
+        guard index != primaryViewControllerIndex else {
+            nav.popToRootViewController(animated: false)
             return
         }
         nav.popToRootViewController(animated: false)
