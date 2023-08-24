@@ -284,10 +284,25 @@ extension BadgesViewController {
         { (action) in
             self.badgePosition = .rightMiddle
         }
+        let action4 = UIAlertAction(title: BadgePostion.topLeftCorner.positionDesc, style: .default)
+        { (action) in
+            self.badgePosition = .topLeftCorner
+        }
+        let action5 = UIAlertAction(title: BadgePostion.bottomLeftCorner.positionDesc, style: .default)
+        { (action) in
+            self.badgePosition = .bottomLeftCorner
+        }
+        let action6 = UIAlertAction(title: BadgePostion.bottomRightCorner.positionDesc, style: .default)
+        { (action) in
+            self.badgePosition = .bottomRightCorner
+        }
         let cancel = UIAlertAction(title: "Cancel", style: .cancel)
         actionSheet.addAction(action1)
         actionSheet.addAction(action2)
         actionSheet.addAction(action3)
+        actionSheet.addAction(action4)
+        actionSheet.addAction(action5)
+        actionSheet.addAction(action6)
         actionSheet.addAction(cancel)
         present(actionSheet, animated: true)
     }

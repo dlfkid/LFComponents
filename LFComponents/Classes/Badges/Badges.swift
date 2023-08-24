@@ -18,8 +18,11 @@ public enum BadgeStyle {
 
 public enum BadgePostion: CaseIterable {
     case topRightCorner
+    case topLeftCorner
     case leftMiddle
     case rightMiddle
+    case bottomRightCorner
+    case bottomLeftCorner
 }
 
 extension BadgePostion {
@@ -27,10 +30,16 @@ extension BadgePostion {
         switch self {
         case .topRightCorner:
             return "Top right corner"
+        case .topLeftCorner:
+            return "Top left corner"
         case .leftMiddle:
             return "Left middle"
         case .rightMiddle:
             return "Right middle"
+        case .bottomLeftCorner:
+            return "Bottom left corner"
+        case .bottomRightCorner:
+            return "Bottom right corner"
         }
     }
 }
@@ -58,19 +67,22 @@ extension BadgesAdaptable {
         }
         switch position {
         case .topRightCorner: do {
-            // 根据内容调整自身大小
             badgeView.sizeToFit()
-            
-            // 移动到右上角
             let right = superView.width
-            // 调整中心位置
             let offset = badgeView.image == nil ? 4.0 : 8.0
             badgeView.x = right + offset
             badgeView.y = 0
         }
             
+        case .topLeftCorner: do {
+            badgeView.sizeToFit()
+            let right = 0.0
+            let offset = badgeView.image == nil ? 4.0 : 8.0
+            badgeView.x = right - offset
+            badgeView.y = 0
+        }
+            
         case .leftMiddle: do {
-            // 根据内容调整自身大小
             badgeView.sizeToFit()
             let offset = badgeView.image == nil ? 4.0 : 8.0
             badgeView.right = -offset
@@ -78,11 +90,26 @@ extension BadgesAdaptable {
         }
             
         case .rightMiddle: do {
-            // 根据内容调整自身大小
             badgeView.sizeToFit()
             let offset = badgeView.image == nil ? 4.0 : 8.0
             badgeView.left = superView.width + offset
             badgeView.centerY = superView.height / 2
+        }
+            
+        case .bottomLeftCorner: do {
+            badgeView.sizeToFit()
+            let right = 0.0
+            let offset = badgeView.image == nil ? 4.0 : 8.0
+            badgeView.x = right - offset
+            badgeView.bottom = superView.height
+        }
+            
+        case .bottomRightCorner: do {
+            badgeView.sizeToFit()
+            let right = superView.width
+            let offset = badgeView.image == nil ? 4.0 : 8.0
+            badgeView.x = right + offset
+            badgeView.bottom = superView.height
         }
         }
         // 向左不可超过自身一半, 或16px
@@ -210,7 +237,7 @@ public class BadgeView: UIControl {
     public override func sizeToFit() {
         textLabel.sizeToFit()
         imageView.sizeToFit()
-        let margin = text == nil && image == nil ? 6.0 : 3.0
+        let margin = text == nil && image == nil ? 6.0 : 5.0
         let width = max(textLabel.frame.width, imageView.frame.width) + margin
         let height = max(textLabel.frame.height, imageView.frame.height) + margin
         let actualWidth = max(width, height)
