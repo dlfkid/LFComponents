@@ -21,6 +21,9 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
+		7EFC071E2AAB0BCE0085A133 /* PullToRefreshViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EFC071D2AAB0BCE0085A133 /* PullToRefreshViewController.swift */; };
+		7EFC07202AAB20220085A133 /* RefreshSystemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EFC071F2AAB20220085A133 /* RefreshSystemViewController.swift */; };
+		7EFC07222AAB202E0085A133 /* RefreshRingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EFC07212AAB202E0085A133 /* RefreshRingViewController.swift */; };
 		87018651684340B9510017BB /* Pods_LFComponents_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72891343DB805D7BAF1E0B0E /* Pods_LFComponents_Example.framework */; };
 /* End PBXBuildFile section */
 
@@ -58,6 +61,9 @@
 		6D005526DF81793F084D3F83 /* Pods-LFComponents_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LFComponents_Example.release.xcconfig"; path = "Target Support Files/Pods-LFComponents_Example/Pods-LFComponents_Example.release.xcconfig"; sourceTree = "<group>"; };
 		72891343DB805D7BAF1E0B0E /* Pods_LFComponents_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LFComponents_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		729B24417222880C18E944DE /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
+		7EFC071D2AAB0BCE0085A133 /* PullToRefreshViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullToRefreshViewController.swift; sourceTree = "<group>"; };
+		7EFC071F2AAB20220085A133 /* RefreshSystemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshSystemViewController.swift; sourceTree = "<group>"; };
+		7EFC07212AAB202E0085A133 /* RefreshRingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshRingViewController.swift; sourceTree = "<group>"; };
 		8956BD9CBB7C3D8DDF1183E3 /* Pods-LFComponents_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LFComponents_Tests.debug.xcconfig"; path = "Target Support Files/Pods-LFComponents_Tests/Pods-LFComponents_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		8CA25BCD4CCED7A0C8697F4F /* Pods_LFComponents_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LFComponents_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9C442EA52A7FDE9C8CC4E8D4 /* Pods-LFComponents_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LFComponents_Example.debug.xcconfig"; path = "Target Support Files/Pods-LFComponents_Example/Pods-LFComponents_Example.debug.xcconfig"; sourceTree = "<group>"; };
@@ -126,6 +132,9 @@
 				35F559C92A7E927C000BD17D /* TramViewController.swift */,
 				352E296F2A74D1E10021FD90 /* LayoutConstants.swift */,
 				35F559CB2A82832A000BD17D /* SidemenuViewController.swift */,
+				7EFC071D2AAB0BCE0085A133 /* PullToRefreshViewController.swift */,
+				7EFC071F2AAB20220085A133 /* RefreshSystemViewController.swift */,
+				7EFC07212AAB202E0085A133 /* RefreshRingViewController.swift */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
@@ -353,6 +362,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7EFC07222AAB202E0085A133 /* RefreshRingViewController.swift in Sources */,
 				35F559CC2A82832A000BD17D /* SidemenuViewController.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				352E296C2A74D0090021FD90 /* BadgesViewController.swift in Sources */,
@@ -362,7 +372,9 @@
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 				35F559C42A7E9263000BD17D /* AirplaneViewController.swift in Sources */,
 				35F559CA2A7E927C000BD17D /* TramViewController.swift in Sources */,
+				7EFC07202AAB20220085A133 /* RefreshSystemViewController.swift in Sources */,
 				352E29702A74D1E10021FD90 /* LayoutConstants.swift in Sources */,
+				7EFC071E2AAB0BCE0085A133 /* PullToRefreshViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

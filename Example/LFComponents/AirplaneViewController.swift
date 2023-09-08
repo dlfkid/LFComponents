@@ -18,6 +18,7 @@ class AirplaneViewController: UIViewController, SideMenuControllable {
         view.backgroundColor = .systemPink
         title = "AirPlane"
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "list.bullet"), style: .done, target: self, action: #selector(menuButtonAction))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Pop", style: .plain, target: self, action: #selector(popAction))
     }
 }
 
@@ -27,5 +28,12 @@ extension AirplaneViewController {
             return
         }
         delegate.sidemenuSwitchState()
+    }
+    
+    @objc private func popAction() {
+        guard let delegate = sideMenuContainer else {
+            return
+        }
+        delegate.navigationController?.popViewController(animated: true)
     }
 }

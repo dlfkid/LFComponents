@@ -18,6 +18,7 @@ class CarViewController: UIViewController, SideMenuControllable {
         view.backgroundColor = .systemYellow
         title = "car"
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "list.bullet"), style: .done, target: self, action: #selector(menuButtonAction))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Pop", style: .plain, target: self, action: #selector(popAction))
     }
 }
 
@@ -27,5 +28,12 @@ extension CarViewController {
             return
         }
         delegate.sidemenuSwitchState()
+    }
+    
+    @objc private func popAction() {
+        guard let delegate = sideMenuContainer else {
+            return
+        }
+        delegate.navigationController?.popViewController(animated: true)
     }
 }

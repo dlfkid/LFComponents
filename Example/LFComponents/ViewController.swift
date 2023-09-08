@@ -12,15 +12,18 @@ import LFComponents
 enum UIComponentType: CaseIterable {
     case Badges
     case Sidebar
+    case PullToRefresh
 }
 
 extension UIComponentType {
     var caseTitle: String {
         switch self {
-            case .Badges:
-                return "Badges"
+        case .Badges:
+            return "Badges"
         case .Sidebar:
             return "SideBar"
+        case .PullToRefresh:
+            return "PullToRefresh"
         }
     }
 }
@@ -69,6 +72,9 @@ extension ViewController: UITableViewDelegate {
                 TramViewController(),
             ]
             navigationController?.pushViewController(sidebarViewController, animated: true)
+        case .PullToRefresh:
+            let pullToRefreshVC = PullToRefreshViewController()
+            navigationController?.pushViewController(pullToRefreshVC, animated: true)
         }
         
     }
