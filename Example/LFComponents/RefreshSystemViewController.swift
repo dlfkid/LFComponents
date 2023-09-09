@@ -21,8 +21,8 @@ class RefreshSystemViewController: UITableViewController {
         title = "Refresh System"
         view.backgroundColor = .white
         tableView.isRefreshFooterHidden = true
-        tableView.addRefreshHeader(type: .system, target: self, selector: #selector(refreshHeaderEvent))
-        tableView.addRefreshFooter(target: self, selector: #selector(refreshFooterEvent))
+        tableView.addRefreshHeader(type: .system, style: .blue, target: self, selector: #selector(refreshHeaderEvent))
+        tableView.addRefreshFooter(type: .system, style: .blue, target: self, selector: #selector(refreshFooterEvent))
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

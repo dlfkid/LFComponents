@@ -13,7 +13,7 @@ class RefreshRingViewController: UITableViewController {
     
     var cases: [String] = []
     
-    let reuseIdentifier = "systemRefreshCell"
+    let reuseIdentifier = "ringRefreshCell"
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,8 +21,8 @@ class RefreshRingViewController: UITableViewController {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
         view.backgroundColor = .white
         tableView.isRefreshFooterHidden = true
-        tableView.addRefreshHeader(type: .system, target: self, selector: #selector(refreshHeaderEvent))
-        tableView.addRefreshFooter(target: self, selector: #selector(refreshFooterEvent))
+        tableView.addRefreshHeader(type: .circle, target: self, selector: #selector(refreshHeaderEvent))
+        tableView.addRefreshFooter(type: .circle, target: self, selector: #selector(refreshFooterEvent))
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

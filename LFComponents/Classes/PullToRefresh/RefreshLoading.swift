@@ -39,17 +39,64 @@ public extension RefreshLoadingable where Self : UIView {
 public typealias RefreshBaseView = UIView & RefreshLoadingable
 
 /// header 刷新类型
-public enum RefreshHeaderType {
+public enum RefreshType {
     case circle
     case system
     case dots
 }
 
-/// footer 刷新类型
-public enum RefreshFooterType {
-    case circle
-    case system
-    case dots
+extension RefreshType {
+    private static let bundleName = "LFComponents.bundle"
+    var imageBundleName: String {
+        switch self {
+        case .circle:
+            return String("\(RefreshType.bundleName)/loading_ring")
+        case .system:
+            return String("\(RefreshType.bundleName)/loading_system")
+        case .dots:
+            return String("\(RefreshType.bundleName)/loading_dots")
+        }
+    }
+}
+
+/// 刷新主题颜色
+public enum RefreshTintStyle {
+    case black
+    case blue
+    case white
+}
+
+extension RefreshTintStyle {
+    var colorName: String {
+        switch self {
+        case .black:
+            return "black"
+        case .blue:
+            return "blue"
+        case .white:
+            return "white"
+        }
+    }
+}
+
+/// 刷新图标大小
+public enum RefreshIconSize {
+    case small
+    case medium
+    case large
+}
+
+extension RefreshIconSize {
+    var size: CGSize {
+        switch self {
+        case .small:
+            return CGSize(width: 16, height: 16)
+        case .medium:
+            return CGSize(width: 20, height: 20)
+        case .large:
+            return CGSize(width: 28, height: 28)
+        }
+    }
 }
 
 // MARK: - stop loading
@@ -67,45 +114,21 @@ public extension UIScrollView {
     
     /// 手动触发头部刷新
     func begingHeaderRefreshing() {
-        if let refreshControl = (refreshHeader as? UIRefreshControl) {
-            if refreshControl.isRefreshing { return }
-            adjustContentOffsetToTriggerRefresh(y: max(refreshControl.height, Constants.kDefaultLoadingContentOffset))
-            refreshControl.beginRefreshing()
-            refreshControl.sendActions(for: .valueChanged)
-        } else if let refreshView = (refreshHeader as? RefreshView) {
+        if let refreshView = (refreshHeader as? RefreshView) {
             refreshView.beginLoading()
-        } else {
-            //
         }
     }
     
     /// 添加一个头部刷新控件
-    /// - Parameter type: 使用系统的UIRefreshControl  或者  默认的一个⭕️
+    /// - Parameter type: RefreshHeaderType
     /// - Parameter target: target.perform(sel: selector)
     /// - Parameter selector: selector
     @discardableResult
-    func addRefreshHeader(type: RefreshHeaderType = .circle, target: AnyObject, selector: Selector) -> UIView? {
+    func addRefreshHeader(type: RefreshType = .circle, style: RefreshTintStyle = .black, size: RefreshIconSize = .medium, text: String = "下拉刷新", refreshingText: String = "下拉刷新", target: AnyObject, selector: Selector) -> UIView? {
                 
         guard isEnable(target: target, to: selector) else { return nil }
-        
-        switch type {
-        case .circle, .dots, .system:
-            guard let refreshView = headerLoadingView(type: type) else { return nil }
-            return addRefreshHeader(loadingView: refreshView, target: target, selector: selector)
-        }
-    }
-    
-    /// 添加一个自定义图片的头部刷新控件
-    /// - Parameter image: image
-    /// - Parameter target: target  target.perform(sel: selector)
-    /// - Parameter selector: selector
-    @discardableResult
-    func addRefreshHeader(image: UIImage?, target: AnyObject, selector: Selector) -> UIView? {
-
-        guard isEnable(target: target, to: selector) else { return nil }
-        guard let loadingView = headerLoadingView(type: .circle) as? RefreshLoadingCircleView else { return nil }
-        loadingView.loadingImage = image
-        return addRefreshHeader(loadingView: loadingView, target: target, selector: selector)
+        guard let refreshView = headerLoadingView(type: type, style: style, size: size, text: text, refreshingText: refreshingText) else { return nil }
+        return addRefreshHeader(loadingView: refreshView, target: target, selector: selector)
     }
     
     /// 添加一个自定义的头部刷新控件
@@ -150,30 +173,25 @@ public extension UIScrollView {
     }
     
     /// 获取刷新的基础 header view
-    private func headerLoadingView(type: RefreshHeaderType) -> RefreshBaseView? {
+    private func headerLoadingView(type: RefreshType, style: RefreshTintStyle, size: RefreshIconSize, text: String, refreshingText: String) -> RefreshBaseView? {
+        let height = Constants.kLoadingViewHeight
+        let refreshViewFrame = CGRect(x: 0.0, y: 0.0, width: width, height: height)
+        var refreshView: RefreshLoadingDefaultView = RefreshLoadingCircleView(frame: refreshViewFrame)
         switch type {
         case .circle:
-            let height = Constants.kLoadingViewHeight
-            let refreshViewFrame = CGRect(x: 0.0, y: 0.0, width: width, height: height)
-            let refreshView = RefreshLoadingCircleView(frame: refreshViewFrame)
-            refreshView.loadingTitle = "正在刷新"
-            refreshView.notloadingTitle = "下拉刷新"
-            return refreshView
+            break
         case .dots:
-            let height = Constants.kLoadingViewHeight
-            let refreshViewFrame = CGRect(x: 0.0, y: 0.0, width: width, height: height)
-            let refreshView = RefreshLoadingDotsView(frame: refreshViewFrame)
-            refreshView.loadingTitle = "正在刷新"
-            refreshView.notloadingTitle = "下拉刷新"
-            return refreshView
+            refreshView = RefreshLoadingDotsView(frame: refreshViewFrame)
         case .system:
-            let height = Constants.kLoadingViewHeight
-            let refreshViewFrame = CGRect(x: 0.0, y: 0.0, width: width, height: height)
-            let refreshView = RefreshLoadingSystemView(frame: refreshViewFrame)
-            refreshView.loadingTitle = "正在刷新"
-            refreshView.notloadingTitle = "下拉刷新"
-            return refreshView
+            refreshView = RefreshLoadingSystemView(frame: refreshViewFrame)
         }
+        let imageName = String("\(type.imageBundleName)_\(style.colorName)")
+        let bundle = Bundle(for: RefreshLoadingCircleView.self)
+        let image = UIImage(named: imageName, in: bundle, compatibleWith: nil)
+        refreshView.loadingImage = image?.resizeImage(toSize: size.size)
+        refreshView.loadingTitle = refreshingText
+        refreshView.notloadingTitle = text
+        return refreshView
     }
     
     /// 添加刷新控件
@@ -203,11 +221,11 @@ public extension UIScrollView {
     /// - Parameter target: target
     /// - Parameter selector: selector
     @discardableResult
-    func addRefreshFooter(type: RefreshFooterType = .circle, target: AnyObject, selector: Selector) -> UIView? {
+    func addRefreshFooter(type: RefreshType = .circle, style: RefreshTintStyle = .black, size: RefreshIconSize = .medium, text: String = "上拉加载更多", refreshingText: String = "正在加载更多", target: AnyObject, selector: Selector) -> UIView? {
 
         guard isEnable(target: target, to: selector) else { return nil }
         
-        guard let loadingView = footerLoadingView(type: type) else { return nil }
+        guard let loadingView = footerLoadingView(type: type, style: style, size: size, text: text, refreshingText: refreshingText) else { return nil }
         return addRefreshFooter(loadingView: loadingView, target: target, selector: selector)
     }
     
@@ -243,30 +261,25 @@ public extension UIScrollView {
     }
     
     /// 获取刷新的基础 footer view
-    private func footerLoadingView(type: RefreshFooterType) -> RefreshBaseView? {
+    private func footerLoadingView(type: RefreshType, style: RefreshTintStyle = .black, size: RefreshIconSize, text: String, refreshingText: String) -> RefreshBaseView? {
+        let loadingHeight = Constants.kLoadingViewHeight
+        let loadingFrame = CGRect(x: 0.0, y: 0.0, width: width, height: loadingHeight)
+        var refreshView: RefreshLoadingMoreDeafultView = RefreshLoadingMoreCircleView(frame: loadingFrame)
         switch type {
         case .circle:
-            let loadingHeight = Constants.kLoadingViewHeight
-            let loadingFrame = CGRect(x: 0.0, y: 0.0, width: width, height: loadingHeight)
-            let refreshView = RefreshLoadingMoreCircleView(frame: loadingFrame)
-            refreshView.loadingTitle = "正在加载更多"
-            refreshView.notloadingTitle = "上拉加载更多"
-            return refreshView
+            refreshView = RefreshLoadingMoreCircleView(frame: loadingFrame)
         case .dots:
-            let loadingHeight = Constants.kLoadingViewHeight
-            let loadingFrame = CGRect(x: 0.0, y: 0.0, width: width, height: loadingHeight)
-            let refreshView = RefreshLoadingMoreDotsView(frame: loadingFrame)
-            refreshView.loadingTitle = "正在加载更多"
-            refreshView.notloadingTitle = "上拉加载更多"
-            return refreshView
+            refreshView = RefreshLoadingMoreDotsView(frame: loadingFrame)
         case .system:
-            let loadingHeight = Constants.kLoadingViewHeight
-            let loadingFrame = CGRect(x: 0.0, y: 0.0, width: width, height: loadingHeight)
-            let refreshView = RefreshLoadingMoreSystemView(frame: loadingFrame)
-            refreshView.loadingTitle = "正在加载更多"
-            refreshView.notloadingTitle = "上拉加载更多"
-            return refreshView
+            refreshView = RefreshLoadingMoreSystemView(frame: loadingFrame)
         }
+        let imageName = String("\(type.imageBundleName)_\(style.colorName)")
+        let bundle = Bundle(for: RefreshLoadingCircleView.self)
+        let image = UIImage(named: imageName, in: bundle, compatibleWith: nil)
+        refreshView.loadingImage = image?.resizeImage(toSize: size.size)
+        refreshView.loadingTitle = refreshingText
+        refreshView.notloadingTitle = text
+        return refreshView
     }
     
     /// 停止 footer 刷新

@@ -40,7 +40,7 @@ class RefreshLoadingDefaultView: RefreshBaseView {
         return label
     }()
     
-    let containerView = UIView(frame: .zero)
+    private let containerView = UIView(frame: .zero)
     
     var isLoading: Bool = false
     
@@ -153,11 +153,25 @@ class RefreshLoadingDefaultView: RefreshBaseView {
 }
 
 class RefreshLoadingMoreCircleView: RefreshLoadingMoreDeafultView {
-    
+    override func configUI() {
+        super.configUI()
+        let name = "loading_ring_black"
+        guard let image = UIImage(named: "LFComponents.bundle/\(name)", in: Bundle(for: RefreshLoadingMoreCircleView.self), compatibleWith: nil) else {
+            return
+        }
+        loadingImage = image
+    }
 }
 
 class RefreshLoadingMoreSystemView: RefreshLoadingMoreDeafultView {
-    
+    override func configUI() {
+        super.configUI()
+        let name = "loading_system_black"
+        guard let image = UIImage(named: "LFComponents.bundle/\(name)", in: Bundle(for: RefreshLoadingMoreCircleView.self), compatibleWith: nil) else {
+            return
+        }
+        loadingImage = image
+    }
 }
 
 class RefreshLoadingMoreDotsView: RefreshLoadingMoreDeafultView {
