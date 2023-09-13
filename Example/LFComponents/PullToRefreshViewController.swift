@@ -11,6 +11,7 @@ import UIKit
 enum PullToRefreshStyle: CaseIterable {
     case systemLike
     case ring
+    case dots
 }
 
 extension PullToRefreshStyle {
@@ -20,6 +21,8 @@ extension PullToRefreshStyle {
             return "System Like"
         case .ring:
             return "Ring"
+        case .dots:
+            return "Dots"
         }
     }
 }
@@ -51,6 +54,8 @@ extension PullToRefreshViewController: UITableViewDelegate {
             navigationController?.pushViewController(RefreshSystemViewController(), animated: true)
         case .ring:
             navigationController?.pushViewController(RefreshRingViewController(), animated: true)
+        case .dots:
+            navigationController?.pushViewController(RefreshDotsTableViewController(), animated: true)
         }
     }
 }

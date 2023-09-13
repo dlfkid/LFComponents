@@ -21,6 +21,7 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
+		7E71C1B42AB1A88E00B7EDC3 /* RefreshDotsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E71C1B32AB1A88E00B7EDC3 /* RefreshDotsTableViewController.swift */; };
 		7EFC071E2AAB0BCE0085A133 /* PullToRefreshViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EFC071D2AAB0BCE0085A133 /* PullToRefreshViewController.swift */; };
 		7EFC07202AAB20220085A133 /* RefreshSystemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EFC071F2AAB20220085A133 /* RefreshSystemViewController.swift */; };
 		7EFC07222AAB202E0085A133 /* RefreshRingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EFC07212AAB202E0085A133 /* RefreshRingViewController.swift */; };
@@ -61,6 +62,7 @@
 		6D005526DF81793F084D3F83 /* Pods-LFComponents_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LFComponents_Example.release.xcconfig"; path = "Target Support Files/Pods-LFComponents_Example/Pods-LFComponents_Example.release.xcconfig"; sourceTree = "<group>"; };
 		72891343DB805D7BAF1E0B0E /* Pods_LFComponents_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LFComponents_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		729B24417222880C18E944DE /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
+		7E71C1B32AB1A88E00B7EDC3 /* RefreshDotsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshDotsTableViewController.swift; sourceTree = "<group>"; };
 		7EFC071D2AAB0BCE0085A133 /* PullToRefreshViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullToRefreshViewController.swift; sourceTree = "<group>"; };
 		7EFC071F2AAB20220085A133 /* RefreshSystemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshSystemViewController.swift; sourceTree = "<group>"; };
 		7EFC07212AAB202E0085A133 /* RefreshRingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshRingViewController.swift; sourceTree = "<group>"; };
@@ -135,6 +137,7 @@
 				7EFC071D2AAB0BCE0085A133 /* PullToRefreshViewController.swift */,
 				7EFC071F2AAB20220085A133 /* RefreshSystemViewController.swift */,
 				7EFC07212AAB202E0085A133 /* RefreshRingViewController.swift */,
+				7E71C1B32AB1A88E00B7EDC3 /* RefreshDotsTableViewController.swift */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
@@ -363,6 +366,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7EFC07222AAB202E0085A133 /* RefreshRingViewController.swift in Sources */,
+				7E71C1B42AB1A88E00B7EDC3 /* RefreshDotsTableViewController.swift in Sources */,
 				35F559CC2A82832A000BD17D /* SidemenuViewController.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				352E296C2A74D0090021FD90 /* BadgesViewController.swift in Sources */,
