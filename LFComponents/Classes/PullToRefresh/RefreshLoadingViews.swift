@@ -21,11 +21,80 @@ class RefreshLoadingSystemView: RefreshLoadingDefaultView {
 }
 
 class RefreshLoadingDotsView: RefreshLoadingDefaultView {
+    
+    enum RefreshLoadingDotState {
+        case dot1On
+        case dot2On
+        case dot3On
+    }
+    
+    private var state: RefreshLoadingDotState = .dot1On {
+        didSet {
+            switch state {
+            case .dot1On:
+                dot1.backgroundColor = .gray
+                dot2.backgroundColor = .lightGray
+                dot3.backgroundColor = .lightGray
+            case .dot2On:
+                dot1.backgroundColor = .lightGray
+                dot2.backgroundColor = .gray
+                dot3.backgroundColor = .lightGray
+            case .dot3On:
+                dot1.backgroundColor = .lightGray
+                dot2.backgroundColor = .lightGray
+                dot3.backgroundColor = .gray
+            }
+        }
+    }
+    
+    private let dot1 = UIView(frame: CGRect(x: 0, y: 0, width: 5, height: 5))
+    
+    private let dot2 = UIView(frame: CGRect(x: 0, y: 0, width: 5, height: 5))
+    
+    private let dot3 = UIView(frame: CGRect(x: 0, y: 0, width: 5, height: 5))
+    
+    private var animationTimer: Timer? = nil
+    
     override func configUI() {
         super.configUI()
+        addSubview(dot1)
+        addSubview(dot2)
+        addSubview(dot3)
+    }
+    
+    override func layoutContent() {
+        super.layoutContent()
+        dot2.center = loadingImageView.center
+        dot1.left = loadingImageView.left
+        dot3.right = loadingImageView.right
     }
     
     override func validateTimer() {
+        animationTimer = Timer(timeInterval: 1, target: self, selector: #selector(dotsRefreshAnimation), userInfo: nil, repeats: true)
+        RunLoop.current.add(animationTimer!, forMode: .commonModes)
+        animationTimer?.fire()
+    }
+    
+    override func invalidateTimer() {
+        animationTimer?.invalidate()
+        animationTimer = nil
+    }
+}
+
+extension RefreshLoadingDotsView {
+    @objc private func dotsRefreshAnimation() {
+        nextDotState()
+    }
+    
+    func nextDotState() {
+        switch state {
+        case .dot1On:
+            state = .dot2On
+        case .dot2On:
+            state = .dot3On
+        case .dot3On:
+            state = .dot1On
+        }
     }
 }
 
@@ -33,14 +102,14 @@ class RefreshLoadingDotsView: RefreshLoadingDefaultView {
 class RefreshLoadingDefaultView: RefreshBaseView {
     // MARK: - Property
     
-    let titleLabel: UILabel = {
+    fileprivate let titleLabel: UILabel = {
         let label = UILabel(frame: .zero)
         label.font = UIFont.systemFont(ofSize: 12)
         label.textColor = UIColor.systemGray
         return label
     }()
     
-    private let containerView = UIView(frame: .zero)
+    fileprivate let containerView = UIView(frame: .zero)
     
     var isLoading: Bool = false
     
@@ -64,7 +133,7 @@ class RefreshLoadingDefaultView: RefreshBaseView {
     }
 
     /// 刷新中的图片
-    private var loadingImageView: UIImageView = UIImageView()
+    fileprivate var loadingImageView: UIImageView = UIImageView()
     /// 刷新定时器
     fileprivate var displayLink: CADisplayLink?
     /// 角度
@@ -114,7 +183,7 @@ class RefreshLoadingDefaultView: RefreshBaseView {
         layoutContent()
     }
     
-    private func layoutContent() {
+    fileprivate func layoutContent() {
         loadingImageView.sizeToFit()
         titleLabel.sizeToFit()
         let height = max(loadingImageView.height, titleLabel.height)
@@ -135,7 +204,7 @@ class RefreshLoadingDefaultView: RefreshBaseView {
     
     // MARK: - Private - Timer
     
-    private func invalidateTimer() {
+    fileprivate func invalidateTimer() {
         displayLink?.invalidate()
         displayLink = nil
     }

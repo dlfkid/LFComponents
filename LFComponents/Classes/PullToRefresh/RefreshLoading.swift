@@ -84,6 +84,7 @@ public enum RefreshIconSize {
     case small
     case medium
     case large
+    case custom(size: CGSize)
 }
 
 extension RefreshIconSize {
@@ -95,6 +96,8 @@ extension RefreshIconSize {
             return CGSize(width: 20, height: 20)
         case .large:
             return CGSize(width: 28, height: 28)
+        case .custom(let size):
+            return size
         }
     }
 }
