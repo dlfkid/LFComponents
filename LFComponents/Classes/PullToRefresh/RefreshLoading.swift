@@ -77,6 +77,28 @@ extension RefreshTintStyle {
             return "white"
         }
     }
+    
+    var mainColor: UIColor {
+        switch self {
+        case .black:
+            return UIColor.hexColor("#333333")
+        case .blue:
+            return UIColor.hexColor("#3355FF")
+        case .white:
+            return UIColor.white
+        }
+    }
+    
+    var sideColor: UIColor {
+        switch self {
+        case .black:
+            return UIColor.hexColor("#E5E5E5")
+        case .blue:
+            return UIColor.hexColor("#E5E5E5")
+        case .white:
+            return UIColor.hexColor("#E5E5E5")
+        }
+    }
 }
 
 /// 刷新图标大小
@@ -84,7 +106,7 @@ public enum RefreshIconSize {
     case small
     case medium
     case large
-    case custom(size: CGSize)
+    case custom(size: CGSize, font: UIFont)
 }
 
 extension RefreshIconSize {
@@ -96,8 +118,21 @@ extension RefreshIconSize {
             return CGSize(width: 20, height: 20)
         case .large:
             return CGSize(width: 28, height: 28)
-        case .custom(let size):
+        case .custom(let size, _):
             return size
+        }
+    }
+    
+    var font: UIFont {
+        switch self {
+        case .small:
+            return UIFont.systemFont(ofSize: 12)
+        case .medium:
+            return UIFont.systemFont(ofSize: 14)
+        case .large:
+            return UIFont.systemFont(ofSize: 16)
+        case .custom(_, let font):
+            return font
         }
     }
 }
@@ -190,10 +225,12 @@ public extension UIScrollView {
         }
         let imageName = String("\(type.imageBundleName)_\(style.colorName)")
         let bundle = Bundle(for: RefreshLoadingCircleView.self)
-        let image = UIImage(named: imageName, in: bundle, compatibleWith: nil)
-        refreshView.loadingImage = image?.resizeImage(toSize: size.size)
+        let image = UIImage(named: imageName, in: bundle, compatibleWith: nil) ?? UIImage()
+        refreshView.loadingImage = image.resizeImage(toSize: size.size)
         refreshView.loadingTitle = refreshingText
         refreshView.notloadingTitle = text
+        refreshView.refreshSize = size
+        refreshView.refreshTintStyle = style
         return refreshView
     }
     
@@ -278,10 +315,12 @@ public extension UIScrollView {
         }
         let imageName = String("\(type.imageBundleName)_\(style.colorName)")
         let bundle = Bundle(for: RefreshLoadingCircleView.self)
-        let image = UIImage(named: imageName, in: bundle, compatibleWith: nil)
-        refreshView.loadingImage = image?.resizeImage(toSize: size.size)
+        let image = UIImage(named: imageName, in: bundle, compatibleWith: nil) ?? UIImage()
+        refreshView.loadingImage = image.resizeImage(toSize: size.size)
         refreshView.loadingTitle = refreshingText
         refreshView.notloadingTitle = text
+        refreshView.refreshTintStyle = style
+        refreshView.refreshSize = size
         return refreshView
     }
     
@@ -318,3 +357,25 @@ extension UIScrollView {
     }
 }
 
+extension UIColor {
+    fileprivate static func hexColor(_ withHexString: String) -> UIColor {
+        var cString:String = withHexString.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+            if (cString.hasPrefix("#")) {
+                cString.remove(at: cString.startIndex)
+            }
+
+            if ((cString.count) != 6) {
+                return UIColor.gray
+            }
+
+            var rgbValue:UInt64 = 0
+            Scanner(string: cString).scanHexInt64(&rgbValue)
+
+            return UIColor(
+                red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
+                green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
+                blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
+                alpha: CGFloat(1.0)
+            )
+    }
+}

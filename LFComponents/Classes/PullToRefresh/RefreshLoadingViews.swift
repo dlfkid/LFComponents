@@ -8,6 +8,29 @@
 import Foundation
 import UIKit
 
+enum RefreshLoadingDotState {
+    case dot1On
+    case dot2On
+    case dot3On
+}
+
+protocol RefreshDotAnimatable {
+    var state: RefreshLoadingDotState {get set}
+}
+
+extension RefreshDotAnimatable {
+    func nextDotState(state: RefreshLoadingDotState) -> RefreshLoadingDotState {
+        switch state {
+        case .dot1On:
+            return .dot2On
+        case .dot2On:
+            return .dot3On
+        case .dot3On:
+            return .dot1On
+        }
+    }
+}
+
 class RefreshLoadingCircleView: RefreshLoadingDefaultView {
     override func configUI() {
         super.configUI()
@@ -20,29 +43,24 @@ class RefreshLoadingSystemView: RefreshLoadingDefaultView {
     }
 }
 
-class RefreshLoadingDotsView: RefreshLoadingDefaultView {
+class RefreshLoadingDotsView: RefreshLoadingDefaultView, RefreshDotAnimatable {
     
-    enum RefreshLoadingDotState {
-        case dot1On
-        case dot2On
-        case dot3On
-    }
-    
-    private var state: RefreshLoadingDotState = .dot1On {
+    internal var state: RefreshLoadingDotState = .dot1On {
         didSet {
+            let style = refreshTintStyle
             switch state {
             case .dot1On:
-                dot1.backgroundColor = .gray
-                dot2.backgroundColor = .lightGray
-                dot3.backgroundColor = .lightGray
+                dot1.backgroundColor = style.mainColor
+                dot2.backgroundColor = style.sideColor
+                dot3.backgroundColor = style.sideColor
             case .dot2On:
-                dot1.backgroundColor = .lightGray
-                dot2.backgroundColor = .gray
-                dot3.backgroundColor = .lightGray
+                dot1.backgroundColor = style.sideColor
+                dot2.backgroundColor = style.mainColor
+                dot3.backgroundColor = style.sideColor
             case .dot3On:
-                dot1.backgroundColor = .lightGray
-                dot2.backgroundColor = .lightGray
-                dot3.backgroundColor = .gray
+                dot1.backgroundColor = style.sideColor
+                dot2.backgroundColor = style.sideColor
+                dot3.backgroundColor = style.mainColor
             }
         }
     }
@@ -57,20 +75,27 @@ class RefreshLoadingDotsView: RefreshLoadingDefaultView {
     
     override func configUI() {
         super.configUI()
-        addSubview(dot1)
-        addSubview(dot2)
-        addSubview(dot3)
+        dot1.layer.cornerRadius = 2.5
+        containerView.addSubview(dot1)
+        dot2.layer.cornerRadius = 2.5
+        containerView.addSubview(dot2)
+        dot3.layer.cornerRadius = 2.5
+        containerView.addSubview(dot3)
+        state = .dot1On
     }
     
     override func layoutContent() {
         super.layoutContent()
-        dot2.center = loadingImageView.center
-        dot1.left = loadingImageView.left
-        dot3.right = loadingImageView.right
+        dot3.centerY = titleLabel.centerY
+        dot3.right = titleLabel.left - 16
+        dot2.centerY = titleLabel.centerY
+        dot2.right = titleLabel.left - 16 - 5 - 8
+        dot1.centerY = titleLabel.centerY
+        dot1.right = titleLabel.left - 16 - 5 - 8 - 5 - 8
     }
     
     override func validateTimer() {
-        animationTimer = Timer(timeInterval: 1, target: self, selector: #selector(dotsRefreshAnimation), userInfo: nil, repeats: true)
+        animationTimer = Timer(timeInterval: 0.25, target: self, selector: #selector(dotsRefreshAnimation), userInfo: nil, repeats: true)
         RunLoop.current.add(animationTimer!, forMode: .commonModes)
         animationTimer?.fire()
     }
@@ -83,29 +108,19 @@ class RefreshLoadingDotsView: RefreshLoadingDefaultView {
 
 extension RefreshLoadingDotsView {
     @objc private func dotsRefreshAnimation() {
-        nextDotState()
-    }
-    
-    func nextDotState() {
-        switch state {
-        case .dot1On:
-            state = .dot2On
-        case .dot2On:
-            state = .dot3On
-        case .dot3On:
-            state = .dot1On
-        }
+        state = nextDotState(state: self.state)
     }
 }
 
 
 class RefreshLoadingDefaultView: RefreshBaseView {
-    // MARK: - Property
+    var refreshSize: RefreshIconSize = .medium
+    
+    var refreshTintStyle: RefreshTintStyle = .black
     
     fileprivate let titleLabel: UILabel = {
         let label = UILabel(frame: .zero)
         label.font = UIFont.systemFont(ofSize: 12)
-        label.textColor = UIColor.systemGray
         return label
     }()
     
@@ -184,12 +199,17 @@ class RefreshLoadingDefaultView: RefreshBaseView {
     }
     
     fileprivate func layoutContent() {
-        loadingImageView.sizeToFit()
+        let iconSize = refreshSize.size
+        loadingImageView.frame = CGRect(x: 0, y: 0, width: iconSize.width, height: iconSize.height)
+        let style = refreshTintStyle
+        titleLabel.textColor = style.mainColor
+        titleLabel.font = refreshSize.font
         titleLabel.sizeToFit()
         let height = max(loadingImageView.height, titleLabel.height)
         let width = (loadingImageView.width + titleLabel.width + 8)
         containerView.frame = CGRectMake(0, 0, width, height)
         containerView.center = center
+        containerView.centerY = centerY - 20
         loadingImageView.centerY = containerView.centerY
         titleLabel.centerY = loadingImageView.centerY
         loadingImageView.left = 0
@@ -243,16 +263,80 @@ class RefreshLoadingMoreSystemView: RefreshLoadingMoreDeafultView {
     }
 }
 
-class RefreshLoadingMoreDotsView: RefreshLoadingMoreDeafultView {
+class RefreshLoadingMoreDotsView: RefreshLoadingMoreDeafultView, RefreshDotAnimatable {
+    
+    internal var state: RefreshLoadingDotState = .dot1On {
+        didSet {
+            let style = refreshTintStyle
+            switch state {
+            case .dot1On:
+                dot1.backgroundColor = style.mainColor
+                dot2.backgroundColor = style.sideColor
+                dot3.backgroundColor = style.sideColor
+            case .dot2On:
+                dot1.backgroundColor = style.sideColor
+                dot2.backgroundColor = style.mainColor
+                dot3.backgroundColor = style.sideColor
+            case .dot3On:
+                dot1.backgroundColor = style.sideColor
+                dot2.backgroundColor = style.sideColor
+                dot3.backgroundColor = style.mainColor
+            }
+        }
+    }
+    
+    private let dot1 = UIView(frame: CGRect(x: 0, y: 0, width: 5, height: 5))
+    
+    private let dot2 = UIView(frame: CGRect(x: 0, y: 0, width: 5, height: 5))
+    
+    private let dot3 = UIView(frame: CGRect(x: 0, y: 0, width: 5, height: 5))
+    
+    private var animationTimer: Timer? = nil
+    
     override func configUI() {
         super.configUI()
+        dot1.layer.cornerRadius = 2.5
+        containerView.addSubview(dot1)
+        dot2.layer.cornerRadius = 2.5
+        containerView.addSubview(dot2)
+        dot3.layer.cornerRadius = 2.5
+        containerView.addSubview(dot3)
+        state = .dot1On
+    }
+    
+    override func updateViewsFrame() {
+        super.updateViewsFrame()
+        dot3.centerY = titleLabel.centerY
+        dot3.right = titleLabel.left - 16
+        dot2.centerY = titleLabel.centerY
+        dot2.right = titleLabel.left - 16 - 5 - 8
+        dot1.centerY = titleLabel.centerY
+        dot1.right = titleLabel.left - 16 - 5 - 8 - 5 - 8
     }
     
     override func validateTimer() {
+        animationTimer = Timer(timeInterval: 0.25, target: self, selector: #selector(dotsRefreshAnimation), userInfo: nil, repeats: true)
+        RunLoop.current.add(animationTimer!, forMode: .commonModes)
+        animationTimer?.fire()
+    }
+    
+    override func invalidateTimer() {
+        animationTimer?.invalidate()
+        animationTimer = nil
+    }
+}
+
+extension RefreshLoadingMoreDotsView {
+    @objc private func dotsRefreshAnimation() {
+        state = nextDotState(state: self.state)
     }
 }
 
 class RefreshLoadingMoreDeafultView: RefreshBaseView {
+    
+    var refreshSize: RefreshIconSize = .medium
+    
+    var refreshTintStyle: RefreshTintStyle = .black
     
     var loadingTitle: String?
     
@@ -276,7 +360,7 @@ class RefreshLoadingMoreDeafultView: RefreshBaseView {
     // MARK: - Property
     var isLoading: Bool = false
     
-    let titleLabel: UILabel = {
+    fileprivate let titleLabel: UILabel = {
         let label = UILabel(frame: .zero)
         label.font = UIFont.systemFont(ofSize: 12)
         label.textColor = UIColor.systemGray
@@ -284,7 +368,7 @@ class RefreshLoadingMoreDeafultView: RefreshBaseView {
     }()
     
     /// 刷新中的图片
-    private var loadingImageView: UIImageView = UIImageView()
+    fileprivate var loadingImageView: UIImageView = UIImageView()
     /// 刷新定时器
     fileprivate var displayLink: CADisplayLink?
     /// 角度
@@ -329,8 +413,12 @@ class RefreshLoadingMoreDeafultView: RefreshBaseView {
         titleLabel.text = notloadingTitle
     }
     
-    private func updateViewsFrame() {
-        loadingImageView.sizeToFit()
+    fileprivate func updateViewsFrame() {
+        let iconSize = refreshSize.size
+        loadingImageView.frame = CGRect(x: 0, y: 0, width: iconSize.width, height: iconSize.height)
+        let style = refreshTintStyle
+        titleLabel.textColor = style.mainColor
+        titleLabel.font = refreshSize.font
         titleLabel.sizeToFit()
         let height = max(loadingImageView.height, titleLabel.height)
         let width = (loadingImageView.width + titleLabel.width + 8)
@@ -350,7 +438,7 @@ class RefreshLoadingMoreDeafultView: RefreshBaseView {
     
     // MARK: - Private - Timer
     
-    private func invalidateTimer() {
+    fileprivate func invalidateTimer() {
         displayLink?.invalidate()
         displayLink = nil
     }

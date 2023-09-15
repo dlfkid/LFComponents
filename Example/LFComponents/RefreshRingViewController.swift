@@ -21,7 +21,7 @@ class RefreshRingViewController: UITableViewController {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
         view.backgroundColor = .white
         tableView.isRefreshFooterHidden = true
-        tableView.addRefreshHeader(type: .circle, target: self, selector: #selector(refreshHeaderEvent))
+        tableView.addRefreshHeader(type: .circle, size: .large, target: self, selector: #selector(refreshHeaderEvent))
         tableView.addRefreshFooter(type: .circle, target: self, selector: #selector(refreshFooterEvent))
     }
     
