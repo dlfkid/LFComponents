@@ -19,10 +19,10 @@ class RefreshRingViewController: UITableViewController {
         super.viewDidLoad()
         title = "Refresh Ring"
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
-        view.backgroundColor = .white
+        view.backgroundColor = .black
         tableView.isRefreshFooterHidden = true
-        tableView.addRefreshHeader(type: .circle, size: .large, target: self, selector: #selector(refreshHeaderEvent))
-        tableView.addRefreshFooter(type: .circle, target: self, selector: #selector(refreshFooterEvent))
+        tableView.addRefreshHeader(type: .circle, style: .white, size: .large, target: self, selector: #selector(refreshHeaderEvent))
+        tableView.addRefreshFooter(type: .circle, style: .white, size: .large, target: self, selector: #selector(refreshFooterEvent))
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
