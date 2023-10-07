@@ -169,6 +169,8 @@ public extension NSObjectProtocol where Self: BadgesAdaptable {
 }
 
 public class BadgeView: UIControl {
+    static var badgeViewIdentifier: Void?
+    
     /// 记录Badge的偏移量 Record the offset of Badge
     public var offset: CGPoint = CGPoint(x: 0, y: 0)
     

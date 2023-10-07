@@ -12,11 +12,9 @@ import Foundation
 // MARK: - BadgeView
 extension UIView {
     
-    static var badgeViewIdentifier = "lf_badge_view_identifier"
-    
     public var badgeView: BadgeView {
         get {
-            guard let aValue = objc_getAssociatedObject(self, &UIView.badgeViewIdentifier) as? BadgeView else {
+            guard let aValue = objc_getAssociatedObject(self, &BadgeView.badgeViewIdentifier) as? BadgeView else {
                 let badgeControl = BadgeView.default()
                 self.addSubview(badgeControl)
                 self.bringSubview(toFront: badgeControl)
@@ -26,7 +24,7 @@ extension UIView {
             return aValue
         }
         set {
-            objc_setAssociatedObject(self, &UIView.badgeViewIdentifier, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(self, &BadgeView.badgeViewIdentifier, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
     }
 }
