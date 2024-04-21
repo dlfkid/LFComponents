@@ -13,8 +13,8 @@ extension UIBarButtonItem: BadgesAdaptable {
         _bottomView.badges.set(.clean)
     }
     
-    public var badgeView: BadgeView {
-        return _bottomView.badgeView
+    public var lfc_badgeView: BadgeView {
+        return _bottomView.lfc_badgeView
     }
     
     public func addDot() {

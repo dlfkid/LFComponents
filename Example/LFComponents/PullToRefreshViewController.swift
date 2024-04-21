@@ -2,11 +2,17 @@
 //  PullToRefreshViewController.swift
 //  LFComponents_Example
 //
-//  Created by 邓凌峰(DengLingfeng)-顺丰科技技术集团 on 2023/9/8.
+//  Created by Ravendeng on 2023/9/8.
 //  Copyright © 2023 CocoaPods. All rights reserved.
 //
 
 import UIKit
+import LFComponents
+
+protocol RefreshShowable {
+    var tintStyle: LFCRefreshTintStyle {get set}
+    var iconSize: LFCRefreshIconSize {get set}
+}
 
 enum PullToRefreshStyle: CaseIterable {
     case systemLike
@@ -37,6 +43,7 @@ class PullToRefreshViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.navigationBar.isHidden = false
         title = "Pull to Refresh"
         tableView.frame = UIScreen.main.bounds
         view.addSubview(tableView)
@@ -51,11 +58,11 @@ extension PullToRefreshViewController: UITableViewDelegate {
         let style = dataSource[indexPath.row]
         switch style {
         case .systemLike:
-            navigationController?.pushViewController(RefreshSystemViewController(), animated: true)
+            navigationController?.pushViewController(SystemRefreshViewController(), animated: true)
         case .ring:
-            navigationController?.pushViewController(RefreshRingViewController(), animated: true)
+            navigationController?.pushViewController(NormalRefreshViewController(), animated: true)
         case .dots:
-            navigationController?.pushViewController(RefreshDotsTableViewController(), animated: true)
+            navigationController?.pushViewController(DotRefreshViewController(), animated: true)
         }
     }
 }
