@@ -14,10 +14,10 @@ extension UIView: BadgesAdaptable {
     ///
     /// - Parameter text: 文本字符串
     public func addBadge(text: String?) {
-        badgeView.isHidden = false
-        badgeView.text = text
-        badgeView.image = nil
-        bringSubview(toFront: badgeView)
+        lfc_badgeView.isHidden = false
+        lfc_badgeView.text = text
+        lfc_badgeView.image = nil
+        bringSubviewToFront(lfc_badgeView)
     }
     
     /// 添加带数字的Badge, 默认右上角,红色,18pts
@@ -28,7 +28,7 @@ extension UIView: BadgesAdaptable {
     public func addBadge(number: Int) {
         guard number > 0 else {
             addBadge(text: "0")
-            badgeView.isHidden = true
+            lfc_badgeView.isHidden = true
             return
         }
         guard number <= 999 else {
@@ -44,13 +44,13 @@ extension UIView: BadgesAdaptable {
     }
     
     public func addBadge(icon: UIImage?) {
-        badgeView.isHidden = false
-        badgeView.image = icon
-        badgeView.text = nil
-        bringSubview(toFront: badgeView)
+        lfc_badgeView.isHidden = false
+        lfc_badgeView.image = icon
+        lfc_badgeView.text = nil
+        bringSubviewToFront(lfc_badgeView)
     }
     
     public func cleanBadge() {
-        badgeView.isHidden = true
+        lfc_badgeView.isHidden = true
     }
 }

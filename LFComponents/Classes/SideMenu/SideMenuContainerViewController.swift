@@ -72,9 +72,9 @@ public class SideMenuContainerViewController: UIViewController {
             return
         }
         sideMenuVC.sideMenuContainer = self
-        addChildViewController(sideMenuVC)
+        addChild(sideMenuVC)
         view.addSubview(sideMenuVC.view)
-        sideMenuVC.didMove(toParentViewController: self)
+        sideMenuVC.didMove(toParent: self)
     }
     
     private func addPrimarayContainerVC() {
@@ -83,9 +83,9 @@ public class SideMenuContainerViewController: UIViewController {
         }
         primarayViewController.sideMenuContainer = self
         let navigationController = UINavigationController(rootViewController: primarayViewController)
-        addChildViewController(navigationController)
+        addChild(navigationController)
         view.addSubview(navigationController.view)
-        navigationController.didMove(toParentViewController: self)
+        navigationController.didMove(toParent: self)
     }
 }
 

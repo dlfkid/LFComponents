@@ -45,7 +45,7 @@ extension BadgePostion {
 }
 
 public protocol BadgesAdaptable {
-    var badgeView: BadgeView {get}
+    var lfc_badgeView: BadgeView {get}
     
     func addDot()
     
@@ -145,20 +145,20 @@ public struct Badges<BaseView: BadgesAdaptable> {
         switch content {
         case .dot:
             baseView.addDot()
-            baseView.badgeView.backgroundColor = color
+            baseView.lfc_badgeView.backgroundColor = color
         case let .number(number: number):
             baseView.addBadge(number: number ?? 0)
-            baseView.badgeView.backgroundColor = color
+            baseView.lfc_badgeView.backgroundColor = color
         case let .text(text: text):
             baseView.addBadge(text: text ?? "")
-            baseView.badgeView.backgroundColor = color
+            baseView.lfc_badgeView.backgroundColor = color
         case let .icon(icon: icon):
             baseView.addBadge(icon: icon)
-            baseView.badgeView.backgroundColor = .clear
+            baseView.lfc_badgeView.backgroundColor = .clear
         case .clean:
             baseView.cleanBadge()
         }
-        baseView.move(badgeView: baseView.badgeView, position: position, offset: offset)
+        baseView.move(badgeView: baseView.lfc_badgeView, position: position, offset: offset)
     }
 }
 

@@ -1,25 +1,25 @@
 //
-//  UIViewBadgesExtension.swift
-//  LFComponents
+//  RefreshViewController.swift
+//  ExampleDevDemo
 //
-//  Created by LeonDeng on 2023/7/29.
+//  Created by Ravendeng on 2023/1/5.
 //
 
 import Foundation
 import UIKit
 
-enum RefreshLoadingDotState {
+enum LFCRefreshLoadingDotState {
     case dot1On
     case dot2On
     case dot3On
 }
 
-protocol RefreshDotAnimatable {
-    var state: RefreshLoadingDotState {get set}
+protocol LFCRefreshDotAnimatable {
+    var state: LFCRefreshLoadingDotState {get set}
 }
 
-extension RefreshDotAnimatable {
-    func nextDotState(state: RefreshLoadingDotState) -> RefreshLoadingDotState {
+extension LFCRefreshDotAnimatable {
+    func nextDotState(state: LFCRefreshLoadingDotState) -> LFCRefreshLoadingDotState {
         switch state {
         case .dot1On:
             return .dot2On
@@ -31,21 +31,23 @@ extension RefreshDotAnimatable {
     }
 }
 
-class RefreshLoadingCircleView: RefreshLoadingDefaultView {
-    override func configUI() {
-        super.configUI()
+class LFCRefreshLoadingCircleView: LFCRefreshLoadingDefaultView {
+}
+
+class LFCRefreshLoadingSystemView: LFCRefreshLoadingDefaultView {
+    /// 每次触发动画旋转的幅度， 默认为1/30
+    override var rotationAnglePerTriggered: CGFloat {
+        return 34/800
     }
 }
 
-class RefreshLoadingSystemView: RefreshLoadingDefaultView {
-    override func configUI() {
-        super.configUI()
-    }
-}
-
-class RefreshLoadingDotsView: RefreshLoadingDefaultView, RefreshDotAnimatable {
+class LFCRefreshLoadingDotsView: LFCRefreshLoadingDefaultView, LFCRefreshDotAnimatable {
     
-    internal var state: RefreshLoadingDotState = .dot1On {
+    override var animationTriggeredRate: CGFloat {
+        return 0.28
+    }
+    
+    internal var state: LFCRefreshLoadingDotState = .dot1On {
         didSet {
             let style = refreshTintStyle
             switch state {
@@ -84,8 +86,8 @@ class RefreshLoadingDotsView: RefreshLoadingDefaultView, RefreshDotAnimatable {
         state = .dot1On
     }
     
-    override func layoutContent() {
-        super.layoutContent()
+    override func updateLoadingStyle() {
+        super.updateLoadingStyle()
         dot3.centerY = titleLabel.centerY
         dot3.right = titleLabel.left - 16
         dot2.centerY = titleLabel.centerY
@@ -95,8 +97,8 @@ class RefreshLoadingDotsView: RefreshLoadingDefaultView, RefreshDotAnimatable {
     }
     
     override func validateTimer() {
-        animationTimer = Timer(timeInterval: 0.25, target: self, selector: #selector(dotsRefreshAnimation), userInfo: nil, repeats: true)
-        RunLoop.current.add(animationTimer!, forMode: .commonModes)
+        animationTimer = Timer(timeInterval: animationTriggeredRate, target: self, selector: #selector(dotsRefreshAnimation), userInfo: nil, repeats: true)
+        RunLoop.current.add(animationTimer!, forMode: RunLoop.Mode.common)
         animationTimer?.fire()
     }
     
@@ -106,17 +108,52 @@ class RefreshLoadingDotsView: RefreshLoadingDefaultView, RefreshDotAnimatable {
     }
 }
 
-extension RefreshLoadingDotsView {
+extension LFCRefreshLoadingDotsView {
     @objc private func dotsRefreshAnimation() {
         state = nextDotState(state: self.state)
     }
 }
 
 
-class RefreshLoadingDefaultView: RefreshBaseView {
-    var refreshSize: RefreshIconSize = .medium
+class LFCRefreshLoadingDefaultView: LFCRefreshBaseView {
+    var actionTextMap: [LFCRefreshLoadingViewStatus : String]?
     
-    var refreshTintStyle: RefreshTintStyle = .black
+    func updateLoadingInterface(for status: LFCRefreshLoadingViewStatus) {
+        guard let text = actionTextMap?[status] as? String else {
+            switch status {
+            case .normal:
+                titleLabel.text = "Pull to refresh"
+            case .canRefresh:
+                titleLabel.text = "Relase to begin refresh"
+            case .refreshing:
+                titleLabel.text = "Refreshing ..."
+            }
+            return
+        }
+        titleLabel.text = text
+    }
+    
+    /// 每次触发动画旋转的幅度， 默认为1/30
+    var rotationAnglePerTriggered: CGFloat {
+        return 1/15
+    }
+    
+    /// 动画触发周期
+    var animationTriggeredRate: CGFloat {
+        return 1/60
+    }
+    
+    var refreshSize: LFCRefreshIconSize = .medium {
+        didSet {
+            updateLoadingStyle()
+        }
+    }
+    
+    var refreshTintStyle: LFCRefreshTintStyle = .black {
+        didSet {
+            updateLoadingStyle()
+        }
+    }
     
     fileprivate let titleLabel: UILabel = {
         let label = UILabel(frame: .zero)
@@ -137,20 +174,11 @@ class RefreshLoadingDefaultView: RefreshBaseView {
             loadingImageView.image = newValue
         }
     }
-    
-    var loadingTitle: String?
-    
-    var notloadingTitle: String? {
-        didSet {
-            titleLabel.text = notloadingTitle
-            layoutContent()
-        }
-    }
 
     /// 刷新中的图片
     fileprivate var loadingImageView: UIImageView = UIImageView()
     /// 刷新定时器
-    fileprivate var displayLink: CADisplayLink?
+    fileprivate var timer: Timer?
     /// 角度
     private var angle: CGFloat = 0.0
 
@@ -169,16 +197,14 @@ class RefreshLoadingDefaultView: RefreshBaseView {
     func startLoading() {
         isLoading = true
         validateTimer()
-        titleLabel.text = loadingTitle
-        layoutContent()
+        updateLoadingStyle()
     }
     
     func stopLoading() {
         isLoading = false
         invalidateTimer()
         loadingImageView.transform = .identity
-        titleLabel.text = notloadingTitle
-        layoutContent()
+        updateLoadingStyle()
     }
     
     // MARK: - Layout
@@ -188,32 +214,51 @@ class RefreshLoadingDefaultView: RefreshBaseView {
         addSubview(containerView)
         containerView.addSubview(loadingImageView)
         containerView.addSubview(titleLabel)
-        titleLabel.text = notloadingTitle
+        updateLoadingInterface(for: .normal)
+        establishConstraints()
+    }
+    
+    /// 布置约束
+    private func establishConstraints() {
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        loadingImageView.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            // Center containerView in the middle of its superview
+            containerView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            containerView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            
+            // Pin loadingImageView to the left, top, and bottom of containerView
+            loadingImageView.leftAnchor.constraint(equalTo: containerView.leftAnchor),
+            loadingImageView.topAnchor.constraint(equalTo: containerView.topAnchor),
+            loadingImageView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
+            
+            // Set titleLabel to the right of loadingImageView and center it vertically to loadingImageView
+            titleLabel.leftAnchor.constraint(equalTo: loadingImageView.rightAnchor, constant: 10),
+            titleLabel.centerYAnchor.constraint(equalTo: loadingImageView.centerYAnchor),
+            
+            // Pin titleLabel to the right of containerView
+            titleLabel.rightAnchor.constraint(equalTo: containerView.rightAnchor),
+            
+            // Ensure the containerView accommodates the size of loadingImageView and titleLabel
+            containerView.rightAnchor.constraint(greaterThanOrEqualTo: titleLabel.rightAnchor)
+        ])
     }
     
     // MARK: - Override
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        layoutContent()
+        updateLoadingStyle()
     }
     
-    fileprivate func layoutContent() {
+    fileprivate func updateLoadingStyle() {
         let iconSize = refreshSize.size
         loadingImageView.frame = CGRect(x: 0, y: 0, width: iconSize.width, height: iconSize.height)
         let style = refreshTintStyle
         titleLabel.textColor = style.mainColor
         titleLabel.font = refreshSize.font
-        titleLabel.sizeToFit()
-        let height = max(loadingImageView.height, titleLabel.height)
-        let width = (loadingImageView.width + titleLabel.width + 8)
-        containerView.frame = CGRectMake(0, 0, width, height)
-        containerView.center = center
-        containerView.centerY = centerY - 20
-        loadingImageView.centerY = containerView.centerY
-        titleLabel.centerY = loadingImageView.centerY
-        loadingImageView.left = 0
-        titleLabel.left = loadingImageView.width + 10
     }
     
     override func willMove(toSuperview newSuperview: UIView?) {
@@ -225,47 +270,48 @@ class RefreshLoadingDefaultView: RefreshBaseView {
     // MARK: - Private - Timer
     
     fileprivate func invalidateTimer() {
-        displayLink?.invalidate()
-        displayLink = nil
+        timer?.invalidate()
+        timer = nil
     }
     
     fileprivate func validateTimer() {
         invalidateTimer()
-        displayLink = CADisplayLink.init(target: self, selector: #selector(loadingSel))
-        displayLink?.add(to: .main, forMode: RunLoopMode.commonModes)
+        timer = Timer(timeInterval: animationTriggeredRate, target: self, selector: #selector(loadingSel), userInfo: nil, repeats: true)
+        if let timer = timer {
+            RunLoop.current.add(timer, forMode: .common)
+        }
     }
     
     @objc private func loadingSel() {
-        angle += 0.3
-        loadingImageView.transform = .makeRotation(angle: angle)
+        angle += rotationAnglePerTriggered
+        loadingImageView.transform = CGAffineTransform(rotationAngle: angle * CGFloat(Double.pi))
     }
 }
 
-class RefreshLoadingMoreCircleView: RefreshLoadingMoreDeafultView {
-    override func configUI() {
-        super.configUI()
-        let name = "loading_ring_black"
-        guard let image = UIImage(named: "LFComponents.bundle/\(name)", in: Bundle(for: RefreshLoadingMoreCircleView.self), compatibleWith: nil) else {
-            return
-        }
-        loadingImage = image
-    }
-}
-
-class RefreshLoadingMoreSystemView: RefreshLoadingMoreDeafultView {
-    override func configUI() {
-        super.configUI()
-        let name = "loading_system_black"
-        guard let image = UIImage(named: "LFComponents.bundle/\(name)", in: Bundle(for: RefreshLoadingMoreCircleView.self), compatibleWith: nil) else {
-            return
-        }
-        loadingImage = image
-    }
-}
-
-class RefreshLoadingMoreDotsView: RefreshLoadingMoreDeafultView, RefreshDotAnimatable {
+class LFCRefreshLoadingMoreCircleView: LFCRefreshLoadingMoreDeafultView {
     
-    internal var state: RefreshLoadingDotState = .dot1On {
+    /// 每次触发动画旋转的幅度， 默认为1/30
+    override var rotationAnglePerTriggered: CGFloat {
+        return 1/15
+    }
+    
+}
+
+class LFCRefreshLoadingMoreSystemView: LFCRefreshLoadingMoreDeafultView {
+    
+    /// 每次触发动画旋转的幅度， 默认为1/30
+    override var rotationAnglePerTriggered: CGFloat {
+        return 34/800
+    }
+}
+
+class LFCRefreshLoadingMoreDotsView: LFCRefreshLoadingMoreDeafultView, LFCRefreshDotAnimatable {
+    
+    override var animationTriggeredRate: CGFloat {
+        return 0.28
+    }
+    
+    internal var state: LFCRefreshLoadingDotState = .dot1On {
         didSet {
             let style = refreshTintStyle
             switch state {
@@ -304,8 +350,8 @@ class RefreshLoadingMoreDotsView: RefreshLoadingMoreDeafultView, RefreshDotAnima
         state = .dot1On
     }
     
-    override func updateViewsFrame() {
-        super.updateViewsFrame()
+    override func updateLoadingStyle() {
+        super.updateLoadingStyle()
         dot3.centerY = titleLabel.centerY
         dot3.right = titleLabel.left - 16
         dot2.centerY = titleLabel.centerY
@@ -315,8 +361,8 @@ class RefreshLoadingMoreDotsView: RefreshLoadingMoreDeafultView, RefreshDotAnima
     }
     
     override func validateTimer() {
-        animationTimer = Timer(timeInterval: 0.25, target: self, selector: #selector(dotsRefreshAnimation), userInfo: nil, repeats: true)
-        RunLoop.current.add(animationTimer!, forMode: .commonModes)
+        animationTimer = Timer(timeInterval: animationTriggeredRate, target: self, selector: #selector(dotsRefreshAnimation), userInfo: nil, repeats: true)
+        RunLoop.current.add(animationTimer!, forMode: RunLoop.Mode.common)
         animationTimer?.fire()
     }
     
@@ -326,24 +372,59 @@ class RefreshLoadingMoreDotsView: RefreshLoadingMoreDeafultView, RefreshDotAnima
     }
 }
 
-extension RefreshLoadingMoreDotsView {
+extension LFCRefreshLoadingMoreDotsView {
     @objc private func dotsRefreshAnimation() {
         state = nextDotState(state: self.state)
     }
 }
 
-class RefreshLoadingMoreDeafultView: RefreshBaseView {
+class LFCRefreshLoadingMoreDeafultView: LFCRefreshBaseView {
     
-    var refreshSize: RefreshIconSize = .medium
+    var actionTextMap: [LFCRefreshLoadingViewStatus : String]?
     
-    var refreshTintStyle: RefreshTintStyle = .black
+    func updateLoadingInterface(for status: LFCRefreshLoadingViewStatus) {
+        guard let text = actionTextMap?[status] as? String else {
+            switch status {
+            case .normal:
+                titleLabel.text = "Drag to load more"
+            case .canRefresh:
+                titleLabel.text = "Release to begin loading"
+            case .refreshing:
+                titleLabel.text = "Loading ..."
+            }
+            return
+        }
+        titleLabel.text = text
+    }
+    
+    /// 每次触发动画旋转的幅度， 默认为1/30
+    var rotationAnglePerTriggered: CGFloat {
+        return 1/15
+    }
+    
+    /// 动画触发周期
+    var animationTriggeredRate: CGFloat {
+        return 1/60
+    }
+    
+    var refreshSize: LFCRefreshIconSize = .medium {
+        didSet {
+            layoutSubviews()
+        }
+    }
+    
+    var refreshTintStyle: LFCRefreshTintStyle = .black {
+        didSet {
+            layoutSubviews()
+        }
+    }
     
     var loadingTitle: String?
     
     var notloadingTitle: String? {
         didSet {
             titleLabel.text = notloadingTitle
-            updateViewsFrame()
+            updateLoadingStyle()
         }
     }
     
@@ -370,7 +451,7 @@ class RefreshLoadingMoreDeafultView: RefreshBaseView {
     /// 刷新中的图片
     fileprivate var loadingImageView: UIImageView = UIImageView()
     /// 刷新定时器
-    fileprivate var displayLink: CADisplayLink?
+    fileprivate var timer: Timer?
     /// 角度
     private var angle: CGFloat = 0.0
     
@@ -380,7 +461,7 @@ class RefreshLoadingMoreDeafultView: RefreshBaseView {
         isLoading = true
         titleLabel.text = loadingTitle
         validateTimer()
-        updateViewsFrame()
+        updateLoadingStyle()
     }
     
     func stopLoading() {
@@ -388,7 +469,7 @@ class RefreshLoadingMoreDeafultView: RefreshBaseView {
         titleLabel.text = notloadingTitle
         loadingImageView.transform = .identity
         invalidateTimer()
-        updateViewsFrame()
+        updateLoadingStyle()
     }
     
     // MARK: - Init
@@ -406,67 +487,74 @@ class RefreshLoadingMoreDeafultView: RefreshBaseView {
     // MARK: - Layout
     
     fileprivate func configUI() {
-        autoresizingMask = .flexibleWidth
         addSubview(containerView)
         containerView.addSubview(loadingImageView)
         containerView.addSubview(titleLabel)
         titleLabel.text = notloadingTitle
+        updateLoadingInterface(for: .normal)
+        establishConstraints()
     }
     
-    fileprivate func updateViewsFrame() {
+    /// 布置约束
+    private func establishConstraints() {
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        loadingImageView.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            // Center containerView in the middle of its superview
+            containerView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            containerView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            
+            // Pin loadingImageView to the left, top, and bottom of containerView
+            loadingImageView.leftAnchor.constraint(equalTo: containerView.leftAnchor),
+            loadingImageView.topAnchor.constraint(equalTo: containerView.topAnchor),
+            loadingImageView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
+            
+            // Set titleLabel to the right of loadingImageView and center it vertically to loadingImageView
+            titleLabel.leftAnchor.constraint(equalTo: loadingImageView.rightAnchor, constant: 10),
+            titleLabel.centerYAnchor.constraint(equalTo: loadingImageView.centerYAnchor),
+            
+            // Pin titleLabel to the right of containerView
+            titleLabel.rightAnchor.constraint(equalTo: containerView.rightAnchor),
+            
+            // Ensure the containerView accommodates the size of loadingImageView and titleLabel
+            containerView.rightAnchor.constraint(greaterThanOrEqualTo: titleLabel.rightAnchor)
+        ])
+    }
+
+    
+    fileprivate func updateLoadingStyle() {
         let iconSize = refreshSize.size
         loadingImageView.frame = CGRect(x: 0, y: 0, width: iconSize.width, height: iconSize.height)
         let style = refreshTintStyle
         titleLabel.textColor = style.mainColor
         titleLabel.font = refreshSize.font
-        titleLabel.sizeToFit()
-        let height = max(loadingImageView.height, titleLabel.height)
-        let width = (loadingImageView.width + titleLabel.width + 8)
-        containerView.frame = CGRectMake(0, 0, width, height)
-        containerView.centerX = centerX
-        containerView.centerY = 30
-        loadingImageView.centerY = containerView.centerY
-        titleLabel.centerY = loadingImageView.centerY
-        loadingImageView.left = 0
-        titleLabel.left = loadingImageView.width + 10
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        updateViewsFrame()
+        updateLoadingStyle()
     }
     
     // MARK: - Private - Timer
     
     fileprivate func invalidateTimer() {
-        displayLink?.invalidate()
-        displayLink = nil
+        timer?.invalidate()
+        timer = nil
     }
     
     fileprivate func validateTimer() {
         invalidateTimer()
-        displayLink = CADisplayLink.init(target: self, selector: #selector(loadingSel))
-        displayLink?.add(to: .main, forMode: RunLoopMode.commonModes)
+        timer = Timer(timeInterval: animationTriggeredRate, target: self, selector: #selector(loadingSel), userInfo: nil, repeats: true)
+        if let timer = timer {
+            RunLoop.current.add(timer, forMode: .common)
+        }
     }
     
     @objc private func loadingSel() {
-        angle += 0.3
-        loadingImageView.transform = .makeRotation(angle: angle)
-    }
-}
-
-//MARK: - CGAffineTransform
-fileprivate extension CGAffineTransform {
-    static func makeRotation(angle: CGFloat) -> CGAffineTransform {
-        return __CGAffineTransformMake(cos(angle), sin(angle), -sin(angle), cos(angle), 0, 0)
-    }
-    
-    static func makeTranslation(tx: CGFloat, ty: CGFloat) -> CGAffineTransform {
-        return __CGAffineTransformMake(1, 0, 0, 1, tx, ty)
-    }
-    
-    static func makeScale(sx: CGFloat, sy: CGFloat) -> CGAffineTransform {
-        return __CGAffineTransformMake(sx, 0, 0, sy, 0, 0)
+        angle += rotationAnglePerTriggered
+        loadingImageView.transform = CGAffineTransform(rotationAngle: angle * CGFloat(Double.pi))
     }
 }
 

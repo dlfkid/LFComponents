@@ -12,13 +12,13 @@ import Foundation
 // MARK: - BadgeView
 extension UIView {
     
-    public var badgeView: BadgeView {
+    public var lfc_badgeView: BadgeView {
         get {
             guard let aValue = objc_getAssociatedObject(self, &BadgeView.badgeViewIdentifier) as? BadgeView else {
                 let badgeControl = BadgeView.default()
                 self.addSubview(badgeControl)
-                self.bringSubview(toFront: badgeControl)
-                self.badgeView = badgeControl
+                self.bringSubviewToFront(badgeControl)
+                self.lfc_badgeView = badgeControl
                 return badgeControl
             }
             return aValue
