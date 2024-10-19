@@ -13,6 +13,8 @@ enum UIComponentType: CaseIterable {
     case Badges
     case Sidebar
     case PullToRefresh
+    case DragView
+    case HoverView
 }
 
 extension UIComponentType {
@@ -24,6 +26,10 @@ extension UIComponentType {
             return "SideBar"
         case .PullToRefresh:
             return "PullToRefresh"
+        case .DragView:
+            return "DragView"
+        case .HoverView:
+            return "HoverView"
         }
     }
 }
@@ -75,6 +81,12 @@ extension ViewController: UITableViewDelegate {
         case .PullToRefresh:
             let pullToRefreshVC = PullToRefreshViewController()
             navigationController?.pushViewController(pullToRefreshVC, animated: true)
+        case .DragView:
+            let dragVC = FloatingViewController()
+            navigationController?.pushViewController(dragVC, animated: true)
+        case .HoverView:
+            let hoverVC = HoverViewController()
+            navigationController?.pushViewController(hoverVC, animated: true)
         }
         
     }

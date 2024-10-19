@@ -26,6 +26,8 @@
 		7E5106D42BD4EA58003D18F0 /* ShowCaseRefreshViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5106CF2BD4EA58003D18F0 /* ShowCaseRefreshViewController.swift */; };
 		7E5106D52BD4EA58003D18F0 /* SystemRefreshViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5106D02BD4EA58003D18F0 /* SystemRefreshViewController.swift */; };
 		7E5106D72BD4EAB2003D18F0 /* PullToRefreshViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E5106D62BD4EAB2003D18F0 /* PullToRefreshViewController.swift */; };
+		7E56E5D62CC39DA90097A552 /* HoverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E56E5D42CC39DA80097A552 /* HoverViewController.swift */; };
+		7E56E5D72CC39DA90097A552 /* FloatingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E56E5D52CC39DA90097A552 /* FloatingViewController.swift */; };
 		87018651684340B9510017BB /* Pods_LFComponents_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72891343DB805D7BAF1E0B0E /* Pods_LFComponents_Example.framework */; };
 /* End PBXBuildFile section */
 
@@ -68,6 +70,8 @@
 		7E5106CF2BD4EA58003D18F0 /* ShowCaseRefreshViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowCaseRefreshViewController.swift; sourceTree = "<group>"; };
 		7E5106D02BD4EA58003D18F0 /* SystemRefreshViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SystemRefreshViewController.swift; sourceTree = "<group>"; };
 		7E5106D62BD4EAB2003D18F0 /* PullToRefreshViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PullToRefreshViewController.swift; sourceTree = "<group>"; };
+		7E56E5D42CC39DA80097A552 /* HoverViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HoverViewController.swift; sourceTree = "<group>"; };
+		7E56E5D52CC39DA90097A552 /* FloatingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FloatingViewController.swift; sourceTree = "<group>"; };
 		8956BD9CBB7C3D8DDF1183E3 /* Pods-LFComponents_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LFComponents_Tests.debug.xcconfig"; path = "Target Support Files/Pods-LFComponents_Tests/Pods-LFComponents_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		8CA25BCD4CCED7A0C8697F4F /* Pods_LFComponents_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LFComponents_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9C442EA52A7FDE9C8CC4E8D4 /* Pods-LFComponents_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LFComponents_Example.debug.xcconfig"; path = "Target Support Files/Pods-LFComponents_Example/Pods-LFComponents_Example.debug.xcconfig"; sourceTree = "<group>"; };
@@ -141,6 +145,8 @@
 				7E5106D62BD4EAB2003D18F0 /* PullToRefreshViewController.swift */,
 				7E5106CF2BD4EA58003D18F0 /* ShowCaseRefreshViewController.swift */,
 				7E5106D02BD4EA58003D18F0 /* SystemRefreshViewController.swift */,
+				7E56E5D52CC39DA90097A552 /* FloatingViewController.swift */,
+				7E56E5D42CC39DA80097A552 /* HoverViewController.swift */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
@@ -375,6 +381,7 @@
 				7E5106D32BD4EA58003D18F0 /* NormalRefreshViewController.swift in Sources */,
 				7E5106D52BD4EA58003D18F0 /* SystemRefreshViewController.swift in Sources */,
 				35F559C62A7E926B000BD17D /* CarViewController.swift in Sources */,
+				7E56E5D62CC39DA90097A552 /* HoverViewController.swift in Sources */,
 				35F559CE2A828F31000BD17D /* SidemenuOption.swift in Sources */,
 				7E5106D42BD4EA58003D18F0 /* ShowCaseRefreshViewController.swift in Sources */,
 				7E5106D22BD4EA58003D18F0 /* DotRefreshViewController.swift in Sources */,
@@ -382,6 +389,7 @@
 				35F559C42A7E9263000BD17D /* AirplaneViewController.swift in Sources */,
 				35F559CA2A7E927C000BD17D /* TramViewController.swift in Sources */,
 				352E29702A74D1E10021FD90 /* LayoutConstants.swift in Sources */,
+				7E56E5D72CC39DA90097A552 /* FloatingViewController.swift in Sources */,
 				7E5106D72BD4EAB2003D18F0 /* PullToRefreshViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
