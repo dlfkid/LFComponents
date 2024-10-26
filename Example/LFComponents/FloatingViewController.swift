@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import LFComponents
 
 class FloatingViewController: UIViewController {
     
@@ -29,7 +30,6 @@ class FloatingViewController: UIViewController {
         containerView.translatesAutoresizingMaskIntoConstraints = false
         draggableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(containerView)
-        containerView.addSubview(draggableView)
         NSLayoutConstraint.activate([
             containerView.topAnchor.constraint(equalTo: view.topAnchor, constant: 120),
             containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
@@ -37,12 +37,9 @@ class FloatingViewController: UIViewController {
             containerView.heightAnchor.constraint(equalToConstant: 180)
         ])
         
-        NSLayoutConstraint.activate([
-            draggableView.widthAnchor.constraint(equalToConstant: 150),
-            draggableView.heightAnchor.constraint(equalToConstant: 90),
-            draggableView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
-            draggableView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor)
-        ])
+        containerView.addSubview(draggableView)
+        draggableView.frame = CGRect(x: 60, y: 90, width: 150, height: 90)
+        draggableView.lfc.makeDraggable()
+        draggableView.lfc.isKeepBounds = true
     }
-
 }
