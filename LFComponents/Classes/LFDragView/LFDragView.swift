@@ -23,7 +23,13 @@ extension UIView: LFCWrapperable {
 public extension LFCWrapper where T: UIView {
     /// make view draggable
     func makeDraggable() {
-        self.value.addDragGesture()
+        self.value.lfc_addDragGesture()
+    }
+    
+    /// set an auto half shrink interval
+    /// - Parameter interval: interval
+    func makeHalfShink(interval: TimeInterval) {
+        self.value.lfc_makeHalfShink(interval: interval)
     }
     
     /// draggable direction of the view
@@ -86,16 +92,6 @@ public extension LFCWrapper where T: UIView {
         }
     }
     
-    /// the free rect of the view
-    var freeRect: CGRect {
-        get {
-            return self.value.lfc_freeRect
-        }
-        set {
-            self.value.lfc_freeRect = newValue
-        }
-    }
-    
     /// if the view keep bounds
     var isKeepBounds: Bool {
         get {
@@ -138,8 +134,8 @@ private var lfc_freeRectKey: UInt8 = 0
 private var lfc_isKeepBoundsKey: UInt8 = 0
 private var lfc_startPointKey: UInt8 = 0
 private var lfc_animationTimeKey: UInt8 = 0
-private let leftMove: String = "leftMove"
-private let rightMove: String = "rightMove"
+private var lfc_halfShrinkIntervalKey: UInt8 = 0
+private var lfc_halfShrinkTimerKey: UInt8 = 0
 
 extension UIView: LFDraggable {
     
@@ -234,8 +230,26 @@ extension UIView: LFDraggable {
         }
     }
     
+    var lfc_halfShrinkInterval: TimeInterval {
+        get {
+            objc_getAssociatedObject(self, &lfc_halfShrinkIntervalKey) as? TimeInterval ?? 0
+        }
+        set {
+            objc_setAssociatedObject(self, &lfc_halfShrinkIntervalKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
+    
+    private var lfc_halfShrinkTimer: Timer? {
+        get {
+            objc_getAssociatedObject(self, &lfc_halfShrinkTimerKey) as? Timer
+        }
+        set {
+            objc_setAssociatedObject(self, &lfc_halfShrinkTimerKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
+    
     /// Add draGestrue
-    fileprivate func addDragGesture() {
+    fileprivate func lfc_addDragGesture() {
         self.clipsToBounds = true
         
         let singleTap = UITapGestureRecognizer.init(target: self, action: #selector(clickDragView(tap:)))
@@ -246,9 +260,111 @@ extension UIView: LFDraggable {
         panGestureRecognizer.maximumNumberOfTouches = 1
         self.addGestureRecognizer(panGestureRecognizer)
     }
+    
+    fileprivate func lfc_makeHalfShink(interval: TimeInterval) {
+        guard interval > 0 else {
+            return
+        }
+        if let timer = lfc_halfShrinkTimer {
+            timer.invalidate()
+            lfc_halfShrinkTimer = nil
+        }
+        lfc_halfShrinkTimer = Timer(timeInterval: interval, repeats: true, block: { [weak self] timer in
+            // check if the view should shink if it's in the edge of the superview
+            guard let self = self else {
+                return
+            }
+            let edgeType = self.isOnEdge()
+            guard  edgeType != .none else {
+                return
+            }
+            var rect = self.frame
+            switch edgeType {
+            case .none:
+                break
+            case .top:
+                let topOffSet = CGRectGetHeight(self.frame) / 2
+                UIView.beginAnimations(DraggableEdgeType.left.moveAnimationName, context: nil)
+                UIView.setAnimationCurve(.easeInOut)
+                UIView.setAnimationDuration(lfc_animationTime)
+                rect.origin.y -= topOffSet
+                self.frame = rect
+                UIView.commitAnimations()
+            case .left:
+                let leftOffSet = CGRectGetWidth(self.frame) / 2
+                UIView.beginAnimations(DraggableEdgeType.left.moveAnimationName, context: nil)
+                UIView.setAnimationCurve(.easeInOut)
+                UIView.setAnimationDuration(lfc_animationTime)
+                rect.origin.x -= leftOffSet
+                self.frame = rect
+                UIView.commitAnimations()
+                
+            case .bottom:
+                let bottomOffSet = CGRectGetHeight(self.frame) / 2
+                UIView.beginAnimations(DraggableEdgeType.left.moveAnimationName, context: nil)
+                UIView.setAnimationCurve(.easeInOut)
+                UIView.setAnimationDuration(lfc_animationTime)
+                rect.origin.y += bottomOffSet
+                self.frame = rect
+                UIView.commitAnimations()
+            case .right:
+                let rightOffset = CGRectGetWidth(self.frame) / 2
+                UIView.beginAnimations(DraggableEdgeType.left.moveAnimationName, context: nil)
+                UIView.setAnimationCurve(.easeInOut)
+                UIView.setAnimationDuration(lfc_animationTime)
+                rect.origin.x += rightOffset
+                self.frame = rect
+                UIView.commitAnimations()
+            }
+        })
+        if let timer = lfc_halfShrinkTimer {
+            RunLoop.current.add(timer, forMode: .default)
+        }
+    }
+}
+
+enum DraggableEdgeType {
+    case none
+    case top
+    case left
+    case bottom
+    case right
+    
+    var moveAnimationName: String {
+        switch self {
+        case .none:
+            return ""
+        case .top:
+            return "topMove"
+        case .left:
+            return "leftMove"
+        case .bottom:
+            return "bottomMove"
+        case .right:
+            return "rightMove"
+        }
+    }
 }
 
 extension UIView {
+    
+    private func isOnEdge() -> DraggableEdgeType {
+        let freeRect = self.lfc_freeRect
+        let frame = self.frame
+        guard freeRect.width - CGRectGetMaxX(frame) > 1 else {
+            return .right
+        }
+        guard CGRectGetMinX(frame) > 1 else {
+            return .left
+        }
+        guard freeRect.height - CGRectGetMaxY(frame) > 1 else {
+            return .bottom
+        }
+        guard CGRectGetMinY(frame) > 1 else {
+            return .top
+        }
+        return .none
+    }
     
     /// 拖动事件
     @objc func dragAction(pan: UIPanGestureRecognizer){
@@ -340,14 +456,14 @@ extension UIView {
         var rect: CGRect = self.frame
         if lfc_isKeepBounds == false {//没有黏贴边界的效果
             if frame.origin.x < lfc_freeRect.origin.x {
-                UIView.beginAnimations(leftMove, context: nil)
+                UIView.beginAnimations(DraggableEdgeType.left.moveAnimationName, context: nil)
                 UIView.setAnimationCurve(.easeInOut)
                 UIView.setAnimationDuration(lfc_animationTime)
                 rect.origin.x = lfc_freeRect.origin.x
                 self.frame = rect
                 UIView.commitAnimations()
             }else if lfc_freeRect.origin.x + lfc_freeRect.size.width < frame.origin.x + frame.size.width{
-                UIView.beginAnimations(rightMove, context: nil)
+                UIView.beginAnimations(DraggableEdgeType.right.moveAnimationName, context: nil)
                 UIView.setAnimationCurve(.easeInOut)
                 UIView.setAnimationDuration(lfc_animationTime)
                 rect.origin.x = lfc_freeRect.origin.x + lfc_freeRect.size.width - frame.size.width
@@ -358,15 +474,14 @@ extension UIView {
         } else if lfc_isKeepBounds == true{//自动粘边
             if frame.origin.x < centerX {
                 
-                UIView.beginAnimations(leftMove, context: nil)
+                UIView.beginAnimations(DraggableEdgeType.left.moveAnimationName, context: nil)
                 UIView.setAnimationCurve(.easeInOut)
                 UIView.setAnimationDuration(lfc_animationTime)
                 rect.origin.x = lfc_freeRect.origin.x
                 self.frame = rect
                 UIView.commitAnimations()
             }else{
-                
-                UIView.beginAnimations(rightMove, context: nil)
+                UIView.beginAnimations(DraggableEdgeType.right.moveAnimationName, context: nil)
                 UIView.setAnimationCurve(.easeInOut)
                 UIView.setAnimationDuration(lfc_animationTime)
                 rect.origin.x = lfc_freeRect.origin.x + lfc_freeRect.size.width - frame.size.width
@@ -376,14 +491,14 @@ extension UIView {
         }
         
         if frame.origin.y < lfc_freeRect.origin.y {
-            UIView.beginAnimations("topMove", context: nil)
+            UIView.beginAnimations(DraggableEdgeType.top.moveAnimationName, context: nil)
             UIView.setAnimationCurve(.easeInOut)
             UIView.setAnimationDuration(lfc_animationTime)
             rect.origin.y = lfc_freeRect.origin.y
             self.frame = rect
             UIView.commitAnimations()
         }else if lfc_freeRect.origin.y + lfc_freeRect.size.height <  frame.origin.y + frame.size.height {
-            UIView.beginAnimations("bottomMove", context: nil)
+            UIView.beginAnimations(DraggableEdgeType.bottom.moveAnimationName, context: nil)
             UIView.setAnimationCurve(.easeInOut)
             UIView.setAnimationDuration(lfc_animationTime)
             rect.origin.y = lfc_freeRect.origin.y + lfc_freeRect.size.height - frame.size.height

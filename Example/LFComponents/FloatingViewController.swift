@@ -40,6 +40,7 @@ class FloatingViewController: UIViewController {
         containerView.addSubview(draggableView)
         draggableView.frame = CGRect(x: 60, y: 90, width: 150, height: 90)
         draggableView.lfc.makeDraggable()
+        draggableView.lfc.makeHalfShink(interval: 5)
         draggableView.lfc.isKeepBounds = true
     }
 }
