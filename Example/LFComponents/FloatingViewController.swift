@@ -36,11 +36,14 @@ class FloatingViewController: UIViewController {
             containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             containerView.heightAnchor.constraint(equalToConstant: 180)
         ])
-        
+        containerView.clipsToBounds = true
         containerView.addSubview(draggableView)
         draggableView.frame = CGRect(x: 60, y: 90, width: 150, height: 90)
         draggableView.lfc.makeDraggable()
         draggableView.lfc.makeHalfShink(interval: 5)
         draggableView.lfc.isKeepBounds = true
+        draggableView.lfc.onClick = { view, location in
+            print("DraggableView clicked at \(location)")
+        }
     }
 }

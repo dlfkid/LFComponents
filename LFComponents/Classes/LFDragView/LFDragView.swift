@@ -43,7 +43,7 @@ public extension LFCWrapper where T: UIView {
     }
     
     /// click action handler of the draggableView
-    var didClickHandler: LFDragViewClosure? {
+    var onClick: LFDragViewClosure? {
         get {
             return self.value.lfc_didClickHandler
         }
@@ -53,7 +53,7 @@ public extension LFCWrapper where T: UIView {
     }
     
     /// drag action start handler
-    var dragStartHandler: LFDragViewClosure? {
+    var onDragStart: LFDragViewClosure? {
         get {
             return self.value.lfc_dragStartHandler
         }
@@ -63,7 +63,7 @@ public extension LFCWrapper where T: UIView {
     }
     
     /// dragging handler
-    var draggingHandler: LFDragViewClosure? {
+    var onDragging: LFDragViewClosure? {
         get {
             return self.value.lfc_draggingHandler
         }
@@ -73,7 +73,7 @@ public extension LFCWrapper where T: UIView {
     }
     
     /// drag end handler
-    var dragEndHandler: LFDragViewClosure? {
+    var onDragEnd: LFDragViewClosure? {
         get {
             return self.value.lfc_dragEndHandler
         }
@@ -136,6 +136,8 @@ private var lfc_startPointKey: UInt8 = 0
 private var lfc_animationTimeKey: UInt8 = 0
 private var lfc_halfShrinkIntervalKey: UInt8 = 0
 private var lfc_halfShrinkTimerKey: UInt8 = 0
+private var lfc_halfShrinkStatusKey: UInt8 = 0
+private var lfc_isDraggingKey: UInt8 = 0
 
 extension UIView: LFDraggable {
     
@@ -248,6 +250,22 @@ extension UIView: LFDraggable {
         }
     }
     
+    private var lfc_isDragging: Bool {
+        get {
+            objc_getAssociatedObject(self, &lfc_isDraggingKey) as? Bool ?? false
+        } set {
+            objc_setAssociatedObject(self, &lfc_isDraggingKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
+    
+    private var lfc_halfShrinkStatus: DraggableEdgeType {
+        get {
+            objc_getAssociatedObject(self, &lfc_halfShrinkStatusKey) as? DraggableEdgeType ?? .none
+        } set {
+            objc_setAssociatedObject(self, &lfc_halfShrinkStatusKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
+    
     /// Add draGestrue
     fileprivate func lfc_addDragGesture() {
         self.clipsToBounds = true
@@ -273,6 +291,21 @@ extension UIView: LFDraggable {
             // check if the view should shink if it's in the edge of the superview
             guard let self = self else {
                 return
+            }
+            guard !self.lfc_isDragging else {
+                // quit when the view is beening dragged
+                return
+            }
+            guard self.lfc_halfShrinkStatus == .none else {
+                // quit when the view is already in shrink status
+                return
+            }
+            if lfc_freeRect == .zero {
+                if let superview = self.superview {
+                    lfc_freeRect = CGRect.init(origin: .zero, size: superview.bounds.size)
+                } else {
+                    lfc_freeRect = CGRectMake(0, 0, UIScreen.main.bounds.width, UIScreen.main.bounds.height)
+                }
             }
             let edgeType = self.isOnEdge()
             guard  edgeType != .none else {
@@ -316,6 +349,7 @@ extension UIView: LFDraggable {
                 self.frame = rect
                 UIView.commitAnimations()
             }
+            self.lfc_halfShrinkStatus = edgeType
         })
         if let timer = lfc_halfShrinkTimer {
             RunLoop.current.add(timer, forMode: .default)
@@ -382,7 +416,8 @@ extension UIView {
         
         switch pan.state {
         case .began:
-            
+            lfc_isDragging = true
+            lfc_halfShrinkStatus = .none
             lfc_dragStartHandler?(self, center)
             
             // 注意完成移动后，将translation重置为0十分重要。否则translation每次都会叠加
@@ -438,6 +473,7 @@ extension UIView {
             
         case .ended:
             keepBounds()
+            lfc_isDragging = false
             lfc_dragEndHandler?(self, center)
         default:
             break
@@ -446,7 +482,55 @@ extension UIView {
     }
     
     @objc func clickDragView(tap: UITapGestureRecognizer) {
+        guard lfc_halfShrinkStatus == .none else {
+            awakeFromShrink()
+            return
+        }
         lfc_didClickHandler?(self, tap.location(in: self))
+    }
+    
+    /// call out the view from shrink status
+    private func awakeFromShrink() {
+        var rect = self.frame
+        let edgeType = lfc_halfShrinkStatus
+        switch edgeType {
+        case .none:
+            break
+        case .top:
+            let topOffSet = CGRectGetHeight(self.frame) / 2
+            UIView.beginAnimations(DraggableEdgeType.left.moveAnimationName, context: nil)
+            UIView.setAnimationCurve(.easeInOut)
+            UIView.setAnimationDuration(lfc_animationTime)
+            rect.origin.y += topOffSet
+            self.frame = rect
+            UIView.commitAnimations()
+        case .left:
+            let leftOffSet = CGRectGetWidth(self.frame) / 2
+            UIView.beginAnimations(DraggableEdgeType.left.moveAnimationName, context: nil)
+            UIView.setAnimationCurve(.easeInOut)
+            UIView.setAnimationDuration(lfc_animationTime)
+            rect.origin.x += leftOffSet
+            self.frame = rect
+            UIView.commitAnimations()
+            
+        case .bottom:
+            let bottomOffSet = CGRectGetHeight(self.frame) / 2
+            UIView.beginAnimations(DraggableEdgeType.left.moveAnimationName, context: nil)
+            UIView.setAnimationCurve(.easeInOut)
+            UIView.setAnimationDuration(lfc_animationTime)
+            rect.origin.y -= bottomOffSet
+            self.frame = rect
+            UIView.commitAnimations()
+        case .right:
+            let rightOffset = CGRectGetWidth(self.frame) / 2
+            UIView.beginAnimations(DraggableEdgeType.left.moveAnimationName, context: nil)
+            UIView.setAnimationCurve(.easeInOut)
+            UIView.setAnimationDuration(lfc_animationTime)
+            rect.origin.x -= rightOffset
+            self.frame = rect
+            UIView.commitAnimations()
+        }
+        lfc_halfShrinkStatus = .none
     }
     
     /// 黏贴边界效果
