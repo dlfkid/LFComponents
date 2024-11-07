@@ -1,5 +1,5 @@
 //
-//  LFDragView.swift
+//  LFDraggable.swift
 //  ExampleDemo
 //
 //  Created by Ravendeng on 2024/10/19.
@@ -32,6 +32,11 @@ public extension LFCWrapper where T: UIView {
         self.value.lfc_makeHalfShink(interval: interval)
     }
     
+    func awakeFromShrink() {
+        /// call out the view from shrink status
+        self.value.lfc_awakeFromShrink()
+    }
+    
     /// draggable direction of the view
     var draggableDirection: LFDragDirection {
         get {
@@ -39,16 +44,6 @@ public extension LFCWrapper where T: UIView {
         }
         set {
             self.value.lfc_draggableDirection = newValue
-        }
-    }
-    
-    /// click action handler of the draggableView
-    var onClick: LFDragViewClosure? {
-        get {
-            return self.value.lfc_didClickHandler
-        }
-        set {
-            self.value.lfc_didClickHandler = newValue
         }
     }
     
@@ -101,13 +96,17 @@ public extension LFCWrapper where T: UIView {
             self.value.lfc_isKeepBounds = newValue
         }
     }
+    
+    /// current shrink status of the view
+    /// - Returns: DraggableEdgeType
+    func shrinkEdgeType() -> DraggableEdgeType {
+        return self.value.isOnEdge()
+    }
 }
 
 protocol LFDraggable: UIView {
     
     var lfc_draggableDirection: LFDragDirection {get set}
-    
-    var lfc_didClickHandler: LFDragViewClosure? {get set}
     
     var lfc_dragStartHandler: LFDragViewClosure? {get set}
     
@@ -125,7 +124,6 @@ protocol LFDraggable: UIView {
 
 // Extension to add a dynamic property 'name' to UIView using associated objects
 private var lfc_draggableDirectionKey: UInt8 = 0
-private var lfc_didClickHandlerKey: UInt8 = 0
 private var lfc_dragStartHandlerKey: UInt8 = 0
 private var lfc_draggingHandlerKey: UInt8 = 0
 private var lfc_dragEndHandlerKey: UInt8 = 0
@@ -135,6 +133,7 @@ private var lfc_isKeepBoundsKey: UInt8 = 0
 private var lfc_startPointKey: UInt8 = 0
 private var lfc_animationTimeKey: UInt8 = 0
 private var lfc_halfShrinkIntervalKey: UInt8 = 0
+private var lfc_halfShrinkCurrentTickKey: UInt8 = 0
 private var lfc_halfShrinkTimerKey: UInt8 = 0
 private var lfc_halfShrinkStatusKey: UInt8 = 0
 private var lfc_isDraggingKey: UInt8 = 0
@@ -147,15 +146,6 @@ extension UIView: LFDraggable {
         }
         set {
             objc_setAssociatedObject(self, &lfc_draggableDirectionKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-        }
-    }
-    
-    var lfc_didClickHandler: LFDragViewClosure? {
-        get {
-            objc_getAssociatedObject(self, &lfc_didClickHandlerKey) as? LFDragViewClosure
-        }
-        set {
-            objc_setAssociatedObject(self, &lfc_didClickHandlerKey, newValue, .OBJC_ASSOCIATION_COPY_NONATOMIC)
         }
     }
     
@@ -241,6 +231,15 @@ extension UIView: LFDraggable {
         }
     }
     
+    var lfc_halfShrinkCurrentTick: TimeInterval {
+        get {
+            objc_getAssociatedObject(self, &lfc_halfShrinkCurrentTickKey) as? TimeInterval ?? 0
+        }
+        set {
+            objc_setAssociatedObject(self, &lfc_halfShrinkCurrentTickKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
+    
     private var lfc_halfShrinkTimer: Timer? {
         get {
             objc_getAssociatedObject(self, &lfc_halfShrinkTimerKey) as? Timer
@@ -268,11 +267,6 @@ extension UIView: LFDraggable {
     
     /// Add draGestrue
     fileprivate func lfc_addDragGesture() {
-        self.clipsToBounds = true
-        
-        let singleTap = UITapGestureRecognizer.init(target: self, action: #selector(clickDragView(tap:)))
-        self.addGestureRecognizer(singleTap)
-        
         let panGestureRecognizer = UIPanGestureRecognizer.init(target: self, action: #selector(dragAction(pan:)))
         panGestureRecognizer.minimumNumberOfTouches = 1
         panGestureRecognizer.maximumNumberOfTouches = 1
@@ -283,11 +277,13 @@ extension UIView: LFDraggable {
         guard interval > 0 else {
             return
         }
+        lfc_halfShrinkInterval = interval
+        lfc_halfShrinkCurrentTick = lfc_halfShrinkInterval
         if let timer = lfc_halfShrinkTimer {
             timer.invalidate()
             lfc_halfShrinkTimer = nil
         }
-        lfc_halfShrinkTimer = Timer(timeInterval: interval, repeats: true, block: { [weak self] timer in
+        lfc_halfShrinkTimer = Timer(timeInterval: 1, repeats: true, block: { [weak self] timer in
             // check if the view should shink if it's in the edge of the superview
             guard let self = self else {
                 return
@@ -302,15 +298,16 @@ extension UIView: LFDraggable {
             }
             if lfc_freeRect == .zero {
                 if let superview = self.superview {
-                    lfc_freeRect = CGRect.init(origin: .zero, size: superview.bounds.size)
+                    self.lfc_freeRect = CGRect.init(origin: .zero, size: superview.bounds.size)
                 } else {
-                    lfc_freeRect = CGRectMake(0, 0, UIScreen.main.bounds.width, UIScreen.main.bounds.height)
+                    self.lfc_freeRect = CGRectMake(0, 0, UIScreen.main.bounds.width, UIScreen.main.bounds.height)
                 }
             }
-            let edgeType = self.isOnEdge()
-            guard  edgeType != .none else {
+            guard self.lfc_halfShrinkCurrentTick <= 0 else {
+                self.lfc_halfShrinkCurrentTick -= 1
                 return
             }
+            let edgeType = self.isOnEdge()
             var rect = self.frame
             switch edgeType {
             case .none:
@@ -357,7 +354,7 @@ extension UIView: LFDraggable {
     }
 }
 
-enum DraggableEdgeType {
+public enum DraggableEdgeType {
     case none
     case top
     case left
@@ -382,7 +379,7 @@ enum DraggableEdgeType {
 
 extension UIView {
     
-    private func isOnEdge() -> DraggableEdgeType {
+    fileprivate func isOnEdge() -> DraggableEdgeType {
         let freeRect = self.lfc_freeRect
         let frame = self.frame
         guard freeRect.width - CGRectGetMaxX(frame) > 1 else {
@@ -419,7 +416,7 @@ extension UIView {
             lfc_isDragging = true
             lfc_halfShrinkStatus = .none
             lfc_dragStartHandler?(self, center)
-            
+            lfc_halfShrinkCurrentTick = lfc_halfShrinkInterval
             // 注意完成移动后，将translation重置为0十分重要。否则translation每次都会叠加
             pan.setTranslation(CGPoint.zero, in: self)
             // 保存触摸起始点位置
@@ -428,26 +425,6 @@ extension UIView {
             
             lfc_draggingHandler?(self, center)
             // 计算位移 = 当前位置 - 起始位置
-            
-            // 禁止拖动到父类之外区域
-//            if (frame.origin.x < 0 || frame.origin.x > lfc_freeRect.size.width - frame.size.width || frame.origin.y < 0 || frame.origin.y > lfc_freeRect.size.height - frame.size.height){
-//                var newframe: CGRect = self.frame
-//                if frame.origin.x < 0 {
-//                    newframe.origin.x = 0
-//                }else if frame.origin.x > lfc_freeRect.size.width - frame.size.width {
-//                    newframe.origin.x = lfc_freeRect.size.width - frame.size.width
-//                }
-//                if frame.origin.y < 0 {
-//                    newframe.origin.y = 0
-//                }else if frame.origin.y > lfc_freeRect.size.height - frame.size.height{
-//                    newframe.origin.y = lfc_freeRect.size.height - frame.size.height
-//                }
-//                
-//                UIView.animate(withDuration: lfc_animationTime) {
-//                    self.frame = newframe
-//                }
-//                return
-//            }
             
             let point: CGPoint = pan.translation(in: self)
             var dx: CGFloat = 0.0
@@ -481,16 +458,8 @@ extension UIView {
         
     }
     
-    @objc func clickDragView(tap: UITapGestureRecognizer) {
-        guard lfc_halfShrinkStatus == .none else {
-            awakeFromShrink()
-            return
-        }
-        lfc_didClickHandler?(self, tap.location(in: self))
-    }
-    
     /// call out the view from shrink status
-    private func awakeFromShrink() {
+    fileprivate func lfc_awakeFromShrink() {
         var rect = self.frame
         let edgeType = lfc_halfShrinkStatus
         switch edgeType {
@@ -531,6 +500,7 @@ extension UIView {
             UIView.commitAnimations()
         }
         lfc_halfShrinkStatus = .none
+        lfc_halfShrinkCurrentTick = lfc_halfShrinkInterval
     }
     
     /// 黏贴边界效果

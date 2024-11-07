@@ -17,9 +17,10 @@ class FloatingViewController: UIViewController {
         return containerView
     }()
     
-    private lazy var draggableView: UIView = {
-        let dragView = UIView(frame: .zero)
+    private lazy var draggableView: UIControl = {
+        let dragView = UIControl(frame: .zero)
         dragView.backgroundColor = .cyan
+        dragView.addTarget(self, action: #selector(didTappedAction), for: .touchUpInside)
         return dragView
     }()
 
@@ -42,8 +43,9 @@ class FloatingViewController: UIViewController {
         draggableView.lfc.makeDraggable()
         draggableView.lfc.makeHalfShink(interval: 5)
         draggableView.lfc.isKeepBounds = true
-        draggableView.lfc.onClick = { view, location in
-            print("DraggableView clicked at \(location)")
-        }
+    }
+    
+    @objc private func didTappedAction(sender: UIControl) {
+        sender.lfc.awakeFromShrink()
     }
 }
